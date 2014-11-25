@@ -1,14 +1,9 @@
-% blablabla
-
 % Vous ne pouvez pas utiliser le mot-clé 'declare'.
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre système.
    CWD = {Property.condGet 'testcwd' '/home/layus/ucl/fsab1402/2014-2015/projet_2014/src/'}
 
-   % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
-   % [Projet] = {Link ['Projet2014_mozart1.4.ozf']}
-   %
    % Projet fournit quatre fonctions :
    % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
    % {Projet.readFile FileName} = audioVector(AudioVector) OR error(...)
@@ -24,12 +19,25 @@ local Mix Interprete Projet CWD in
    in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
-         Audio
+	 Audio
       end
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-         nil
+	 nil
+      end
+
+      fun {ToNote Note }
+	 case Note
+	 of Nom#Octave then note (nom:Nom octave:Octave alteration:’#’)
+	 [] Atom then
+	    case {AtomToString Atom}
+	    of [N] then note (nom:Atom octave:4 alteration:none)
+	    [] [N O] then note (nom:{StringToAtom [N]}
+				   octave:{StringToInt[O]}
+				   alteration:none)
+	    end
+	 end
       end
    end
 
