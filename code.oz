@@ -24,16 +24,37 @@ local Mix Interprete Projet CWD in
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-	 nil
+	 {Record.make echantillon[duree instrument hauteur]}
+	 echantillon.duree
       end
 
-      fun {ToNote Note }
+      fun {Duree Partition}
+	 
+      end
+
+      fun {Etirer Partition}
+	 
+      end
+
+      fun {Transpose Partition}
+	 
+      end
+
+      fun {Bourdon Partition}
+
+      end
+
+      fun {Muet Partition}
+
+      end
+
+      fun {ToNote Note}
 	 case Note
 	 of Nom#Octave then note (nom:Nom octave:Octave alteration:’#’)
 	 [] Atom then
 	    case {AtomToString Atom}
 	    of [N] then note (nom:Atom octave:4 alteration:none)
-	    [] [N O] then note (nom:{StringToAtom [N]}
+	    [] [N O] then note (nom:{StringToAtom[N]}
 				   octave:{StringToInt[O]}
 				   alteration:none)
 	    end
