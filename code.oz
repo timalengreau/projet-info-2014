@@ -24,30 +24,62 @@ local Mix Interprete Projet CWD in
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-	 {Record.make echantillon[duree instrument hauteur]}
-	 echantillon.duree
-      end
-
-      fun {Duree Partition}
 	 
-      end
+	 local Hauteur in
+	    fun {ToEchantillon Note Duree}
+	       Nom = Note.nom
+	       if Nom == a then Hauteur = 0
+	       elseif Nom == b then Hauteur = 2
+	       elseif Nom == c then Hauteur = 3
+	       elseif Nom == d then Hauteur = 5
+	       elseif Nom == e then Hauteur = 7
+	       elseif Nom == f then Hauteur = 8
+	       elseif Nom == g then Hauteur = 10
+	       else skip
+		  C = Note.octave
+		  Hauteur = Hauteur + ((C-4*12))
+		  if Note.alteration == '#' then Hauteur = Hauteur + 1
+		  else skip
+		     echantillon = (hauteur:Hauteur duree:Duree instrument:none)
+		  end
+	       end
+	    end
+	 end
+	    
+	 fun {TempsTotal Partition}
+	    proc {TempstotalAux Partition Tempstotal}
+	       if Partition == nil then Tempstotal
+	       else {TempstotalAux Partition.2 Tempstotal+1}
+	       end
+	    end
+	 end
 
-      fun {Etirer Partition}
+	 fun {Duree Partition DureeTotaleVoulue}
+	    DureeActuelle = {TempsTotal Partition}
+	    {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+	 end
 	 
+	 fun {Etirer Partition Facteur}
+	    for I in Partition do
+	       I.duree = I.duree * Facteur
+	    end
+	 end
+
+	 fun {Transpose Partition NbreDemiTons}
+	    for I in Partition do
+	       I.hauteur = I.hauteur + NbreDemiTons
+	    end
+	 end
+
+	 fun {Bourdon Partition}
+	    
+	 end
+
+	 fun {Muet Partition}
+	    
+	 end
       end
-
-      fun {Transpose Partition}
-	 
-      end
-
-      fun {Bourdon Partition}
-
-      end
-
-      fun {Muet Partition}
-
-      end
-
+      
       fun {ToNote Note}
 	 case Note
 	 of Nom#Octave then note (nom:Nom octave:Octave alteration:’#’)
@@ -55,8 +87,8 @@ local Mix Interprete Projet CWD in
 	    case {AtomToString Atom}
 	    of [N] then note (nom:Atom octave:4 alteration:none)
 	    [] [N O] then note (nom:{StringToAtom[N]}
-				   octave:{StringToInt[O]}
-				   alteration:none)
+				octave:{StringToInt[O]}
+				alteration:none)
 	    end
 	 end
       end
