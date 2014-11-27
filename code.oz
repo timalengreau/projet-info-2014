@@ -33,12 +33,13 @@ local Mix Interprete Projet CWD in
 	       case Partition
 	       of nil then nil
 	       [] H|T then case H
-			   of muet(P) then 
-			   [] duree(seconces:S P) then {Duree S P} {Lire T}
-			   [] etirer(facteur:F P) then {Etirer F P} {Lire T}
-			   [] bourdon(note:N P) then {Bourdon N P} {Lire T}
-			   [] transpose(demitons:E P) then {Transpose E P} {Lire T}
+			   of muet(P) then {Muet P}
+			   [] duree(seconces:S P) then {Duree S P}
+			   [] etirer(facteur:F P) then {Etirer F P}
+			   [] bourdon(note:N P) then {Bourdon N P}
+			   [] transpose(demitons:E P) then {Transpose E P}
 			   end
+		  {Lire T}
 	       end
 	    end
 
