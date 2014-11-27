@@ -24,7 +24,7 @@ local Mix Interprete Projet CWD in
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-	
+	 
 	 local P in
 	    P={ToNote {Flatten Partition}}
 	    {Lire P}
@@ -32,12 +32,12 @@ local Mix Interprete Projet CWD in
 	    fun {Lire Partition}
 	       case Partition
 	       of nil then nil
-	       [] H|T then case H
-			   of muet(P) then {Muet P}
-			   [] duree(seconces:S P) then {Duree S P}
-			   [] etirer(facteur:F P) then {Etirer F P}
-			   [] bourdon(note:N P) then {Bourdon N P}
-			   [] transpose(demitons:E P) then {Transpose E P}
+	       [] H|T then case H  
+			   of muet(P) then {Muet T}
+			   [] duree(secondes:S P) then {Duree duree.secondes T}
+			   [] etirer(facteur:F P) then {Etirer etirer.facteur T}
+			   [] bourdon(note:N P) then {Bourdon bourdon.note T}
+			   [] transpose(demitons:E P) then {Transpose transpose.demitons T}
 			   end
 		  {Lire T}
 	       end
@@ -57,8 +57,7 @@ local Mix Interprete Projet CWD in
 			   end
 	       end
 	    end
-	    
-		  
+	    		  
 	    fun {ToEchantillon Note Duree}
 	       Nom = Note.nom
 	       local Hauteur in
@@ -87,8 +86,6 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 	    end
-
-
 
 	    fun {Duree DureeTotaleVoulue Partition}
 	       DureeActuelle = {TempsTotal Partition}
