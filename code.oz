@@ -25,9 +25,9 @@ local Mix Interprete Projet CWD in
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
 	 
-	 local Hauteur in
-	    fun {ToEchantillon Note Duree}
-	       Nom = Note.nom
+	 fun {ToEchantillon Note Duree}
+	    Nom = Note.nom
+	    local Hauteur in
 	       if Nom == a then Hauteur = 0
 	       elseif Nom == b then Hauteur = 2
 	       elseif Nom == c then Hauteur = 3
@@ -45,7 +45,7 @@ local Mix Interprete Projet CWD in
 	       end
 	    end
 	 end
-	    
+	 	    
 	 fun {TempsTotal Partition}
 	    proc {TempstotalAux Partition Tempstotal}
 	       if Partition == nil then Tempstotal
@@ -54,29 +54,30 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
-	 fun {Duree Partition DureeTotaleVoulue}
+	 fun {Duree DureeTotaleVoulue Partition}
 	    DureeActuelle = {TempsTotal Partition}
 	    {Etirer Partition DureeTotaleVoulue/DureeActuelle}
 	 end
 	 
-	 fun {Etirer Partition Facteur}
+	 fun {Etirer Facteur Partition}
 	    for I in Partition do
 	       I.duree = I.duree * Facteur
 	    end
 	 end
 
-	 fun {Transpose Partition NbreDemiTons}
+	 fun {Transpose NbreDemiTons Note}
+	    E = {ToEchantillon Note}
+	    E.hauteur = E.hauteur + NbreDemiTons
+	 end
+
+	 fun {Bourdon Note  Partition}
 	    for I in Partition do
-	       I.hauteur = I.hauteur + NbreDemiTons
+	       Partition.I =  Note
 	    end
 	 end
 
-	 fun {Bourdon Partition}
-	    
-	 end
-
 	 fun {Muet Partition}
-	    
+	    {Bourdon note:silence Partition}
 	 end
       end
       
