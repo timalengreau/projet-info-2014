@@ -22,37 +22,42 @@ local Mix Interprete Projet CWD in
 	 local ToAudio Merge Renverser Repetition Clip Echo Fondu Fondu_Enchaine Couper in
 
 	    fun {ToAudio Echantillon}
-	       fun {ToAudioAux hauteur N I}
-		  if I==0 then nil
-		  else
-		     case hauteur
-		     of 'H' then 0|{ToAudioAux 'H' I-1}
-		     of H then local F A in
-				  F=2^(H div 12)*440
-				  A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
-				  A|{ToAudioAux H N I-1}
-			       end
+	       local ToAudioAux in
+		  fun {ToAudioAux hauteur N I}
+		     if I==0 then nil
+		     else
+			case hauteur
+			of 'H' then 0|{ToAudioAux 'H' N I-1}
+			[] H then local F A in
+				     F=2^(H div 12)*440
+				     A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
+				     A|{ToAudioAux H N I-1}
+				  end
+			end
 		     end
 		  end
-	       end
 	       
-	       local n in
-		  n = 44100
-		  case Echantillon
-		  of silence(duree:s) then
-		     local N in
-			N=n*s {ToAudioAux 'H' N N}
-		     end
-		  [] echantillon(hauteur:h duree:s instrument:none) then
-		     local N in
-			N=n*s {ToAudioAux h N N}
-		     end
-		  end     
+		  local n in
+		     n = 44100
+		     case Echantillon
+		     of silence(duree:s) then
+			local N in
+			   N=n*s {ToAudioAux 'H' N N}
+			end
+		     [] echantillon(hauteur:h duree:s instrument:none) then
+			local N in
+			   N=n*s {ToAudioAux h N N}
+			end
+		     end     
+		  end
 	       end
 	    end
 	    
-	    fun {Merge}
-	       Audio
+	    fun {Merge L}
+	       case L
+	       of nil then nil
+		  [] H|T then case H of I#M 
+	       end	       
 	    end
 
 	    fun {Renverser}
