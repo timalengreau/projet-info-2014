@@ -25,7 +25,6 @@ local Mix Interprete Projet CWD in
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
 	 
-<<<<<<< HEAD
 	 local P in
 	    P={ToNote {Flatten Partition}}
 	    {Lire P}
@@ -33,163 +32,100 @@ local Mix Interprete Projet CWD in
 	    fun {Lire Partition}
 	       case Partition
 	       of nil then nil
-	       [] H|T then case H
-			      of muet(P) then 
-			      [] duree(seconces:S P) then {Duree S P} {Lire T}
-			      [] etirer(facteur:F P) then {Etirer F P} {Lire T}
-			      [] bourdon(note:N P) then {Bourdon N P} {Lire T}
-			   [] transpose(demitons:E P) then {Transpose E P} {Lire T}
+	       [] H|T then case H  
+			   of muet(P) then {Muet T}
+			   [] duree(secondes:S P) then {Duree duree.secondes T}
+			   [] etirer(facteur:F P) then {Etirer etirer.facteur T}
+			   [] bourdon(note:N P) then {Bourdon bourdon.note T}
+			   [] transpose(demitons:E P) then {Transpose transpose.demitons T}
 			   end
+		  {Lire T}
 	       end
 	    end
 
 	    fun {ToNote Partition}
-		  case Partition
-		  of nil then nil
-		  [] H|T then case H
-			      of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:’#’)}  M|{ToNote T}
-			      [] Atom then
-				 case {AtomToString Atom}
-				 of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
-				 [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
-				 end
-			      [] H|{ToNote T}
+	       case Partition
+	       of nil then nil
+	       [] H|T then case H
+			   of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:’#’)}  M|{ToNote T}
+			   [] Atom then
+			      case {AtomToString Atom}
+			      of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
+			      [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
 			      end
-		  end
-=======
-	 fun {ToEchantillon Note Duree}
-	    Nom = Note.nom
-	    local Hauteur in
-	       if Nom == a then Hauteur = 0
-	       elseif Nom == b then Hauteur = 2
-	       elseif Nom == c then Hauteur = 3
-	       elseif Nom == d then Hauteur = 5
-	       elseif Nom == e then Hauteur = 7
-	       elseif Nom == f then Hauteur = 8
-	       elseif Nom == g then Hauteur = 10
-	       else skip
-		  C = Note.octave
-		  Hauteur = Hauteur + ((C-4*12))
-		  if Note.alteration == '#' then Hauteur = Hauteur + 1
-		  else skip
-		     echantillon = (hauteur:Hauteur duree:Duree instrument:none)
-		  end
-	       end
-	    end
-	 end
-	 	    
-	 fun {TempsTotal Partition}
-	    proc {TempstotalAux Partition Tempstotal}
-	       if Partition == nil then Tempstotal
-	       else {TempstotalAux Partition.2 Tempstotal+1}
->>>>>>> origin/master
-	       end
-	       	 
-		  local Hauteur in
-		     fun {ToEchantillon Note Duree}
-			Nom = Note.nom
-			if Nom == a then Hauteur = 0
-			elseif Nom == b then Hauteur = 2
-			elseif Nom == c then Hauteur = 3
-			elseif Nom == d then Hauteur = 5
-			elseif Nom == e then Hauteur = 7
-			elseif Nom == f then Hauteur = 8
-			elseif Nom == g then Hauteur = 10
-			else skip
-			   C = Note.octave
-			   Hauteur = Hauteur + ((C-4*12))
-			   if Note.alteration == '#' then Hauteur = Hauteur + 1
-			   else skip
-			      echantillon = (hauteur:Hauteur duree:Duree instrument:none)
+			   [] H|{ToNote T}
 			   end
-			end
+	       end
+	    end
+	    		  
+	    fun {ToEchantillon Note Duree}
+	       Nom = Note.nom
+	       local Hauteur in
+		  if Nom == a then Hauteur = 0
+		  elseif Nom == b then Hauteur = 2
+		  elseif Nom == c then Hauteur = 3
+		  elseif Nom == d then Hauteur = 5
+		  elseif Nom == e then Hauteur = 7
+		  elseif Nom == f then Hauteur = 8
+		  elseif Nom == g then Hauteur = 10
+		  else skip
+		     C = Note.octave
+		     Hauteur = Hauteur + ((C-4*12))
+		     if Note.alteration == '#' then Hauteur = Hauteur + 1
+		     else skip
+			echantillon = (hauteur:Hauteur duree:Duree instrument:none)
 		     end
-		  end
-	    
-		  fun {TempsTotal Partition}
-		     proc {TempstotalAux Partition Tempstotal}
-			if Partition == nil then Tempstotal
-			else {TempstotalAux Partition.2 Tempstotal+1}
-			end
-		     end
-		  end
-
-<<<<<<< HEAD
-		  fun {Duree Partition DureeTotaleVoulue}
-		     DureeActuelle = {TempsTotal Partition}
-		     {Etirer Partition DureeTotaleVoulue/DureeActuelle}
-		  end
-	 
-		  fun {Etirer Partition Facteur}
-		     for I in Partition do
-			I.duree = I.duree * Facteur
-		     end
-		  end
-
-		  fun {Transpose Partition NbreDemiTons}
-		     for I in Partition do
-			I.hauteur = I.hauteur + NbreDemiTons
-		     end
-		  end
-
-		  fun {Bourdon Partition}
-	    
-		  end
-
-		  fun {Muet Partition}
-	    
 		  end
 	       end
-=======
-	 fun {Duree DureeTotaleVoulue Partition}
-	    DureeActuelle = {TempsTotal Partition}
-	    {Etirer Partition DureeTotaleVoulue/DureeActuelle}
-	 end
+	    end
+	 	    
+	    fun {TempsTotal Partition}
+	       proc {TempstotalAux Partition Tempstotal}
+		  if Partition == nil then Tempstotal
+		  else {TempstotalAux Partition.2 Tempstotal+1}
+		  end
+	       end
+	    end
+
+	    fun {Duree DureeTotaleVoulue Partition}
+	       DureeActuelle = {TempsTotal Partition}
+	       {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+	    end
 	 
-	 fun {Etirer Facteur Partition}
-	    for I in Partition do
-	       I.duree = I.duree * Facteur
+	    fun {Etirer Facteur Partition}
+	       for I in Partition do
+		  I.duree = I.duree * Facteur
+	       end
 	    end
-	 end
 
-	 fun {Transpose NbreDemiTons Note}
-	    E = {ToEchantillon Note}
-	    E.hauteur = E.hauteur + NbreDemiTons
-	 end
-
-	 fun {Bourdon Note  Partition}
-	    for I in Partition do
-	       Partition.I =  Note
+	    fun {Transpose NbreDemiTons Note}
+	       E = {ToEchantillon Note}
+	       E.hauteur = E.hauteur + NbreDemiTons
 	    end
-	 end
 
-	 fun {Muet Partition}
-	    {Bourdon note:silence Partition}
+	    fun {Bourdon Note  Partition}
+	       for I in Partition do
+		  Partition.I =  Note
+	       end
+	    end
+
+	    fun {Muet Partition}
+	       {Bourdon note:silence Partition}
+	    end
 	 end
       end
       
-      fun {ToNote Note}
-	 case Note
-	 of Nom#Octave then note (nom:Nom octave:Octave alteration:’#’)
-	 [] Atom then
-	    case {AtomToString Atom}
-	    of [N] then note (nom:Atom octave:4 alteration:none)
-	    [] [N O] then note (nom:{StringToAtom[N]}
-				octave:{StringToInt[O]}
-				alteration:none)
->>>>>>> origin/master
-	    end
-	 end
 
-	 local 
-	    Music = {Projet.load CWD#'joie.dj.oz'}
-	 in
+      local 
+	 Music = {Projet.load CWD#'joie.dj.oz'}
+      in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui démontre les fonctionalités de votre
       % programme.
       %
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
-	    {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
-	 end
+	 {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
       end
+   end
+end
