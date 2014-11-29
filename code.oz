@@ -52,19 +52,19 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 	    
-
-	 fun {Merge L}
-	    case L
-	    of nil then nil
-	    [] H|T then case H of I#M case M
-				      of nil then nil
-				      [] H|T then I*H|{}
-				      end	      
-			end % PAS BON
-	       Audio 
-	    end
-	 end
-
+	% fun {Merge L}
+	%    case L
+	%    of nil then nil
+	%    [] H|T then case H of I#M then
+	%		   case M
+	%		   of nil then nil
+	%		   [] H|T then I*H|{}
+	%		   end	      
+	%		end % PAS BON
+	%    else nil
+	%       Audio 
+	%    end
+	% end
 
 	 fun {Renverser}
 	    Audio
@@ -95,105 +95,103 @@ local Mix Interprete Projet CWD in
 	 end	    
       end
 
-      local V in
+      local V P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
       % Interprete doit interpréter une partition
 	 fun {Interprete Partition}
-	    local P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
-	       P={ToNote {Flatten Partition}}
-	       V={Lire P}
-	       V
+	    P={ToNote {Flatten Partition}}
+	    V={Lire P}
+	    V
+	 end
 	    
-	       fun {Lire Partition}
-		  case Partition
-		  of nil then nil
-		  [] H|T then case H  
-			      of muet(P) then {Muet {Interprete P}}
-			      [] duree(secondes:S P) then {Duree S {Interprete P}}
-			      [] etirer(facteur:F P) then {Etirer F {Interprete P}}
-			      [] bourdon(note:N P) then {Bourdon N {Interprete P}}
-			      [] transpose(demitons:E P) then {Transpose E {Interprete P}}
-			      end
-		     H|{Lire T}
-		  end
-	       end
-
-	       fun {ToNote Partition}
-		  local M in
-		     case Partition
-		     of nil then nil
-		     [] H|T then case H
-				 of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
-				 [] Atom then
-				    case {AtomToString Atom}
-				    of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
-				    [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
-				    end
-				 else  H|{ToNote T}
-				 end
-		     end
-		  end
-	       end
-	       
-	    		  
-	       fun {ToEchantillon Note Duree}
-		  local Nom C Hauteur in
-		     Nom = Note.nom
-		     if Nom == a then Hauteur = 0
-		     elseif Nom == b then Hauteur = 2
-		     elseif Nom == c then Hauteur = 3
-		     elseif Nom == d then Hauteur = 5
-		     elseif Nom == e then Hauteur = 7
-		     elseif Nom == f then Hauteur = 8
-		     elseif Nom == g then Hauteur = 10
-		     end
-		     C = Note.octave
-		     Hauteur = Hauteur + ((C-4*12))
-		     if Note.alteration == '#' then Hauteur = Hauteur + 1
-		     end
-		     echantillon = Note(hauteur:Hauteur duree:Duree instrument:none)	  
-		  end
-	       end
-	       
-	       fun {TempsTotal Partition}
-		  local TempsTotalAux in 
-		     proc {TempsTotalAux Partition TempsTotal}
-			if Partition == nil then TempsTotal
-			else {TempsTotalAux Partition.2 TempsTotal+1}
+	 fun {Lire Partition}
+	    case Partition
+	    of nil then nil
+	    [] H|T then case H  
+			of muet(P) then {Muet {Interprete P}}
+			[] duree(secondes:S P) then {Duree S {Interprete P}}
+			[] etirer(facteur:F P) then {Etirer F {Interprete P}}
+			[] bourdon(note:N P) then {Bourdon N {Interprete P}}
+			[] transpose(demitons:E P) then {Transpose E {Interprete P}}
 			end
-		     end
-		  end
-	       end
+	       H|{Lire T}
+	    end
+	 end
 
-	       fun {Duree DureeTotaleVoulue Partition}
-		  local DureeActuelle in
-		     DureeActuelle = {TempsTotal Partition}
-		     {Etirer Partition DureeTotaleVoulue/DureeActuelle}
-		  end
+	 fun {ToNote Partition}
+	    local M in
+	       case Partition
+	       of nil then nil
+	       [] H|T then case H
+			   of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
+			   [] Atom then
+			      case {AtomToString Atom}
+			      of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
+			      [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
+			      end
+			   else  H|{ToNote T}
+			   end
 	       end
+	    end
+	 end	       
+	    		  
+	 fun {ToEchantillon Note Duree}
+	    local Nom C Hauteur in
+	       Nom = Note.nom
+	       if Nom == a then Hauteur = 0
+	       elseif Nom == b then Hauteur = 2
+	       elseif Nom == c then Hauteur = 3
+	       elseif Nom == d then Hauteur = 5
+	       elseif Nom == e then Hauteur = 7
+	       elseif Nom == f then Hauteur = 8
+	       elseif Nom == g then Hauteur = 10
+	       end
+	       C = Note.octave
+	       Hauteur = Hauteur + ((C-4*12))
+	       if Note.alteration == '#' then Hauteur = Hauteur + 1
+	       end
+	       echantillon = Note(hauteur:Hauteur duree:Duree instrument:none)	  
+	    end
+	 end
+	       
+	 fun {TempsTotal Partition TempsTotal}
+	    case H
+	    of Partition.1 == Note(hauteur:H duree:D instrument:none)
+	    then {TempsTotalAux Partition.2 TempsTotal + Partition.1.note}
+	    [] nil then TempsTotal
+	    else {TempsTotalAux Partition.2 TempsTotal}
+	    end
+	 end
+
+	 fun {Duree DureeTotaleVoulue Partition}
+	    local DureeActuelle in
+	       DureeActuelle = {TempsTotal Partition 0}
+	       {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+	    end
+	 end
 	 
-	       fun {Etirer Facteur Partition}
-		  for I in Partition do
-		     I.duree = I.duree * Facteur
-		  end
-	       end
+	 fun {Etirer Facteur Partition}
+	    for I in Partition do
+	       I.duree = I.duree * Facteur %a verifier
+	    end
+	 end
 
-	       fun {Transpose NbreDemiTons Note}
-		  local E in
-		     E = {ToEchantillon Note}
-		     E.hauteur = E.hauteur + NbreDemiTons
-		  end
-	       end
+	 fun {Transpose NbreDemiTons Note}
+	    local E in
+	       E = {ToEchantillon Note}
+	       E.hauteur = E.hauteur + NbreDemiTons %a verifier
+	    end
+	 end
 
-	       fun {Bourdon Note  Partition}
-		  Partition.1 = Note
-		  {Bourdon Note Partition.2}
-	       end
+	 fun {Bourdon Note Partition}
+	    if Partition == nil then nil
+	    else
+	       Note|{Bourdon Note Partition.2}
+	    end
+	 end
 
-	       fun {Muet Partition}
-		  local Silence in
-		     {Bourdon Silence(duree:1) Partition}
-		  end
-	       end
+	 fun {Muet Partition}
+	    local Silence in
+	       {Bourdon Silence(duree:1) Partition}
 	    end
 	 end
       end
