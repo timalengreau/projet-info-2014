@@ -20,30 +20,39 @@ local Mix Interprete Projet CWD in
       fun {Mix Interprete Music}
 	 local ToAudio Merge Renverser Repetition Clip Echo Fondu Fondu_Enchaine Couper in
 	    fun {ToAudio}
+	       Audio
 	    end
 
 	    fun {Merge}
+	       Audio
 	    end
 
 	    fun {Renverser}
+	       Audio
 	    end
 
 	    fun{Repetition}
+	       Audio
 	    end
 
 	    fun{Clip}
+	       Audio
 	    end
 
 	    fun{Echo}
+	       Audio
 	    end
 
 	    fun{Fondu}
+	       Audio
 	    end
 
 	    fun{Fondu_Enchaine}
+	       Audio
 	    end
 
 	    fun{Couper}
+	       Audio
 	    end
 	    
 	 end
@@ -81,7 +90,7 @@ local Mix Interprete Projet CWD in
 				 of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
 				 [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
 				 end
-			      [] then  H|{ToNote T}
+			      else  H|{ToNote T}
 			      end
 		  end
 	       end
@@ -97,17 +106,15 @@ local Mix Interprete Projet CWD in
 		     elseif Nom == e then Hauteur = 7
 		     elseif Nom == f then Hauteur = 8
 		     elseif Nom == g then Hauteur = 10
-		     else skip
-			C = Note.octave
-			Hauteur = Hauteur + ((C-4*12))
-			if Note.alteration == '#' then Hauteur = Hauteur + 1
-			else skip
-			   echantillon = (hauteur:Hauteur duree:Duree instrument:none)
-			end
 		     end
+		     C = Note.octave
+		     Hauteur = Hauteur + ((C-4*12))
+		     if Note.alteration == '#' then Hauteur = Hauteur + 1
+		     end
+		     echantillon = Note(hauteur:Hauteur duree:Duree instrument:none)	  
 		  end
 	       end
-	 	    
+	       
 	       fun {TempsTotal Partition}
 		  proc {TempstotalAux Partition Tempstotal}
 		     if Partition == nil then Tempstotal
@@ -139,7 +146,7 @@ local Mix Interprete Projet CWD in
 	       end
 
 	       fun {Muet Partition}
-		  {Bourdon note:silence Partition}
+		  {Bourdon Silence(duree:1) Partition}
 	       end
 	    end
 	 end
