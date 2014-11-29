@@ -22,7 +22,7 @@ local Mix Interprete Projet CWD in
 	 local ToAudio Merge Renverser Repetition Clip Echo Fondu Fondu_Enchaine Couper in
 
 	    fun {ToAudio Echantillon}
-	       local ToAudioAux in
+	       local ToAudioAux n in
 		  fun {ToAudioAux hauteur N I}
 		     if I==0 then nil
 		     else
@@ -36,63 +36,63 @@ local Mix Interprete Projet CWD in
 			end
 		     end
 		  end
-	       
-		  local n in
-		     n = 44100
-		     case Echantillon
-		     of silence(duree:s) then
-			local N in
-			   N=n*s {ToAudioAux 'H' N N}
-			end
-		     [] echantillon(hauteur:h duree:s instrument:none) then
-			local N in
-			   N=n*s {ToAudioAux h N N}
-			end
-		     end     
-		  end
+		  
+		  n = 44100
+		  case Echantillon
+		  of silence(duree:s) then
+		     local N in
+			N=n*s {ToAudioAux 'H' N N}
+		     end
+		  [] echantillon(hauteur:h duree:s instrument:none) then
+		     local N in
+			N=n*s {ToAudioAux h N N}
+		     end
+		  end     
 	       end
 	    end
-	    
-	    fun {Merge L}
-	       case L
-	       of nil then nil
-	       [] H|T then case H of I#M case M
-					 of nil then nil
-					 [] H|T then I*H|{}
-					 end	      
-			   end % PAS BON
-		  Audio 
-	    end
-
-	    fun {Renverser}
-	       Audio
-	    end
-
-	    fun{Repetition}
-	       Audio
-	    end
-
-	    fun{Clip}
-	       Audio
-	    end
-
-	    fun{Echo}
-	       Audio
-	    end
-
-	    fun{Fondu}
-	       Audio
-	    end
-
-	    fun{Fondu_Enchaine}
-	       Audio
-	    end
-
-	    fun{Couper}
-	       Audio
-	    end
-	    
 	 end
+	    
+
+	 fun {Merge L}
+	    case L
+	    of nil then nil
+	    [] H|T then case H of I#M case M
+				      of nil then nil
+				      [] H|T then I*H|{}
+				      end	      
+			end % PAS BON
+	       Audio 
+	    end
+	 end
+
+
+	 fun {Renverser}
+	    Audio
+	 end
+
+	 fun {Repetition}
+	    Audio
+	 end
+
+	 fun {Clip}
+	    Audio
+	 end
+
+	 fun {Echo}
+	    Audio
+	 end
+
+	 fun {Fondu}
+	    Audio
+	 end
+
+	 fun {Fondu_Enchaine}
+	    Audio
+	 end
+
+	 fun {Couper}
+	    Audio
+	 end	    
       end
 
       local V in
@@ -118,24 +118,26 @@ local Mix Interprete Projet CWD in
 	       end
 
 	       fun {ToNote Partition}
-		  case Partition
-		  of nil then nil
-		  [] H|T then case H
-			      of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
-			      [] Atom then
-				 case {AtomToString Atom}
-				 of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
-				 [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
+		  local M in
+		     case Partition
+		     of nil then nil
+		     [] H|T then case H
+				 of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
+				 [] Atom then
+				    case {AtomToString Atom}
+				    of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
+				    [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
+				    end
+				 else  H|{ToNote T}
 				 end
-			      else  H|{ToNote T}
-			      end
+		     end
 		  end
 	       end
 	       
 	    		  
 	       fun {ToEchantillon Note Duree}
-		  Nom = Note.nom
-		  local Hauteur in
+		  local Nom C Hauteur in
+		     Nom = Note.nom
 		     if Nom == a then Hauteur = 0
 		     elseif Nom == b then Hauteur = 2
 		     elseif Nom == c then Hauteur = 3
@@ -153,16 +155,20 @@ local Mix Interprete Projet CWD in
 	       end
 	       
 	       fun {TempsTotal Partition}
-		  proc {TempstotalAux Partition Tempstotal}
-		     if Partition == nil then Tempstotal
-		     else {TempstotalAux Partition.2 Tempstotal+1}
+		  local TempsTotalAux in 
+		     proc {TempsTotalAux Partition TempsTotal}
+			if Partition == nil then TempsTotal
+			else {TempsTotalAux Partition.2 TempsTotal+1}
+			end
 		     end
 		  end
 	       end
 
 	       fun {Duree DureeTotaleVoulue Partition}
-		  DureeActuelle = {TempsTotal Partition}
-		  {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+		  local DureeActuelle in
+		     DureeActuelle = {TempsTotal Partition}
+		     {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+		  end
 	       end
 	 
 	       fun {Etirer Facteur Partition}
@@ -172,25 +178,27 @@ local Mix Interprete Projet CWD in
 	       end
 
 	       fun {Transpose NbreDemiTons Note}
-		  E = {ToEchantillon Note}
-		  E.hauteur = E.hauteur + NbreDemiTons
-	       end
-
-	       fun {Bourdon Note  Partition}
-		  for I in Partition do
-		     Partition.I =  Note
+		  local E in
+		     E = {ToEchantillon Note}
+		     E.hauteur = E.hauteur + NbreDemiTons
 		  end
 	       end
 
+	       fun {Bourdon Note  Partition}
+		  Partition.1 = Note
+		  {Bourdon Note Partition.2}
+	       end
+
 	       fun {Muet Partition}
-		  {Bourdon Silence(duree:1) Partition}
+		  local Silence in
+		     {Bourdon Silence(duree:1) Partition}
+		  end
 	       end
 	    end
 	 end
       end
    end
              
-
    local 
       Music = {Projet.load CWD#'joie.dj.oz'}
    in
