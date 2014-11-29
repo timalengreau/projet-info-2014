@@ -87,9 +87,11 @@ local Mix Interprete Projet CWD in
 	       N = {TempsTotal M 0} div D
 	       M1 = {RepetitionN N M}
 	       fun {M2 D M A}
-		  if A+M.1.duree > D then 
-		     else M.1|{M2 D M.2 A+M.1.durre}
-	       end       
+		  if A+M.1.duree > D then nil
+		  else M.1|{M2 D M.2 A+M.1.duree}
+		  end		  
+	       end
+	       M1 + {M2 D M 0}
 	       end
 	 end
 
