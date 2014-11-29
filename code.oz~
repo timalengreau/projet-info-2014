@@ -52,29 +52,19 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 	    
-<<<<<<< HEAD
-	    fun {Merge L}
-	       case L
-	       of nil then nil
-	       [] H|T then case H of I#M case M
-					 of nil then nil
-					 [] H|T then I*H|{}
-					 end	      
-			   end % PAS BON
-		  Audio 
-	    end
 
-	    fun {Renverser}
-	       Audio
-=======
 	 fun {Merge L}
 	    case L
 	    of nil then nil
-	    [] H|T then case H of I#M 
-			end	       
->>>>>>> origin/master
+	    [] H|T then case H of I#M case M
+				      of nil then nil
+				      [] H|T then I*H|{}
+				      end	      
+			end % PAS BON
+	       Audio 
 	    end
 	 end
+
 
 	 fun {Renverser}
 	    Audio
@@ -193,7 +183,7 @@ local Mix Interprete Projet CWD in
 		     E.hauteur = E.hauteur + NbreDemiTons
 		  end
 	       end
-%A changer on ne peut pas faire Partition.I => L.1 - L.2 => L.1 L.2.1 L.2.2
+
 	       fun {Bourdon Note  Partition}
 		  Partition.1 = Note
 		  {Bourdon Note Partition.2}
