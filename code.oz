@@ -16,41 +16,41 @@ local Mix Interprete Projet CWD in
    local
       Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
    in
+      local V P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
       % Mix prends une musique et doit retourner un vecteur audio.
-      fun {Mix Interprete Music}
+	 fun {Mix Interprete Music}
 	 
-	 local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu Fondu_Enchaine Couper in
-
-	    fun {ToAudio Echantillon}
-	       local ToAudioAux n in
-		  fun {ToAudioAux hauteur N I}
-		     if I==0 then nil
-		     else
-			case hauteur
-			of 'H' then 0|{ToAudioAux 'H' N I-1}
-			[] H then local F A in
-				     F=2^(H div 12)*440
-				     A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
-				     A|{ToAudioAux H N I-1}
-				  end
+	    local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Couper in
+	    
+	       fun {ToAudio Echantillon}
+		  local ToAudioAux n in
+		     fun {ToAudioAux hauteur N I}
+			if I==0 then nil
+			else
+			   case hauteur
+			   of 'H' then 0|{ToAudioAux 'H' N I-1}
+			   [] H then local F A in
+					F=2^(H div 12)*440
+					A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
+					A|{ToAudioAux H N I-1}
+				     end
+			   end
 			end
 		     end
-		  end
 		  
-		  n = 44100
-		  case Echantillon
-		  of silence(duree:s) then
-		     local N in
-			N=n*s {ToAudioAux 'H' N N}
-		     end
-		  [] echantillon(hauteur:h duree:s instrument:none) then
-		     local N in
-			N=n*s {ToAudioAux h N N}
-		     end
-		  end     
+		     n = 44100
+		     case Echantillon
+		     of silence(duree:s) then
+			local N in
+			   N=n*s {ToAudioAux 'H' N N}
+			end
+		     [] echantillon(hauteur:h duree:s instrument:none) then
+			local N in
+			   N=n*s {ToAudioAux h N N}
+			end
+		     end     
+		  end
 	       end
-	    end
-	 end
 	    
 	% fun {Merge L}
 	%    case L
@@ -66,58 +66,59 @@ local Mix Interprete Projet CWD in
 	%    end
 	% end
 
-	 fun {Renverser L A} %L est la liste ‡ inverser, A un accumulateur qui vaut nil au dÈpart (du au case dans lequel on fait appel ‡ cette fonction)
-	    case L
-	    of nil then A
-	    [] H|T then {Renverser T H|A}
-	    end  
-	 end
-
-	 fun {RepetitionN N M}
-	    if N==0 then skip
-	    elseif N==1 then M
-	    else if M==nil then {Repetition N-1 M}
-		 else M.1|{Repetition N M.2}
-		 end
-	    end	    
-	 end
-
-	 fun {RepetitionD D M}
-	    local N M1 M2 in
-	       N = {TempsTotal M 0} div D
-	       M1 = {RepetitionN N M}
-	       fun {M2 D M A}
-		  if A+M.1.duree > D then nil
-		  else M.1|{M2 D M.2 A+M.1.duree}
-		  end		  
+	       fun {Renverser L A}
+%L est la liste ‡ inverser, A un accumulateur qui vaut nil au dÈpart (du au case dans lequel on fait appel ‡ cette fonction)
+		  case L
+		  of nil then A
+		  [] H|T then {Renverser T H|A}
+		  end  
 	       end
-	       M1 + {M2 D M 0}
+
+	       fun {RepetitionN N M}
+		  if N==0 then skip
+		  elseif N==1 then M
+		  else if M==nil then {RepetitionN N-1 M}
+		       else M.1|{RepetitionN N M.2}
+		       end
+		  end	    
 	       end
+
+	       fun {RepetitionD D M}
+		  local N M1 M2 in
+		     N = {TempsTotal M 0} div D
+		     M1 = {RepetitionN N M}
+		     fun {M2 D M A}
+			if A+M.1.duree > D then nil
+			else M.1|{M2 D M.2 A+M.1.duree}
+			end		  
+		     end
+		     M1 + {M2 D M 0}
+		  end
+	       end
+
+	       fun {Clip}
+		  Audio
+	       end
+
+	       fun {Echo}
+		  Audio
+	       end
+
+	       fun {Fondu}
+		  Audio
+	       end
+
+	       fun {FonduEnchaine}
+		  Audio
+	       end
+
+	       fun {Couper}
+		  Audio
+	       end	    
+	    end
 	 end
-
-
-	 fun {Clip}
-	    Audio
-	 end
-
-	 fun {Echo}
-	    Audio
-	 end
-
-	 fun {Fondu}
-	    Audio
-	 end
-
-	 fun {Fondu_Enchaine}
-	    Audio
-	 end
-
-	 fun {Couper}
-	    Audio
-	 end	    
-      end
-
-      local V P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
+      
+      
       % Interprete doit interpr√©ter une partition
 	 fun {Interprete Partition}
 	    P={ToNote {Flatten Partition}}
@@ -176,11 +177,10 @@ local Mix Interprete Projet CWD in
 	 end
 	       
 	 fun {TempsTotal Partition TempsTotal}
-	    case H
-	    of Partition.1 == Note(hauteur:H duree:D instrument:none)
-	    then {TempsTotalAux Partition.2 TempsTotal + Partition.1.note}
+	    case Partition.1 of note(hauteur:h duree:d instrument:none)
+	    then {TempsTotal Partition.2 TempsTotal+Partition.1.note}
 	    [] nil then TempsTotal
-	    else {TempsTotalAux Partition.2 TempsTotal}
+	    else {TempsTotal Partition.2 TempsTotal}
 	    end
 	 end
 
