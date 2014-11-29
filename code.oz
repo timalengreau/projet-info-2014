@@ -19,7 +19,7 @@ local Mix Interprete Projet CWD in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
 	 
-	 local ToAudio Merge Renverser Repetition Clip Echo Fondu Fondu_Enchaine Couper in
+	 local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu Fondu_Enchaine Couper in
 
 	    fun {ToAudio Echantillon}
 	       local ToAudioAux n in
@@ -66,13 +66,33 @@ local Mix Interprete Projet CWD in
 	%    end
 	% end
 
-	 fun {Renverser}
-	    Audio
+	 fun {Renverser L A} %L est la liste à inverser, A un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
+	    case L
+	    of nil then A
+	    [] H|T then {Renverser T H|A}
+	    end  
 	 end
 
-	 fun {Repetition}
-	    Audio
+	 fun {RepetitionN N M}
+	    if N==0 then skip
+	    elseif N==1 then M
+	    else if M==nil then {Repetition N-1 M}
+		 else M.1|{Repetition N M.2}
+		 end
+	    end	    
 	 end
+
+	 fun {RepetitionD D M}
+	    local N M1 M2 in
+	       N = {TempsTotal M 0} div D
+	       M1 = {RepetitionN N M}
+	       fun {M2 D M A}
+		  if A+M.1.duree > D then 
+		     else M.1|{M2 D M.2 A+M.1.durre}
+	       end       
+	       end
+	 end
+
 
 	 fun {Clip}
 	    Audio
