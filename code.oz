@@ -76,7 +76,7 @@ local Mix Interprete Projet CWD in
 
 	       fun {RepetitionN N M}
 		  if N==0 then skip
-		  elseif N==1 then M
+		  elseif N==1 then M   % = 1 ou 0 ?
 		  else if M==nil then {RepetitionN N-1 M}
 		       else M.1|{RepetitionN N M.2}
 		       end
@@ -96,10 +96,28 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 
-	       fun {Echo}
-		  Audio
-	       end
+	       fun {Echo Delai Decadence Repetition Musique}
+		  local Intensite A I EchoAux in
 
+		     fun {Intensite d R}
+			if R == 0 then I
+			else I*d^R+{Intensite d R-1}
+			end
+		     end
+
+		     proc {$ I} {Intensite Decadence Repetition} end
+
+		     fun {EchoAux D d R M A}
+			if A==R then nil
+			else I^(A+1)#[voix[silence(duree:D*A)] M]|{EchoAux D d R A+1}
+			end
+		     end
+
+		     {EchoAux Delai Decadence Repetition Musique 0}
+
+		  end
+	       end
+	       
 	       fun {Clip Bas Haut Audio}
 		  case Audio
 		  of nil then nil
