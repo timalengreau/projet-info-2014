@@ -1,6 +1,6 @@
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
-   % modifiez sa valeur pour correspondre à votre système.
+   % modifiez sa valeur pour correspondre à votre systeme.
    CWD = {Property.condGet 'testcwd' '/home/layus/ucl/fsab1402/2014-2015/projet_2014/src/'}
 
    % Projet fournit quatre fonctions :
@@ -10,7 +10,7 @@ local Mix Interprete Projet CWD in
    % {Projet.load 'music_file.oz'} = Oz structure.
    %
    % et une constante :
-   % Projet.hz = 44100, la fréquence d'échantilonnage (nombre de données par seconde)
+   % Projet.hz = 44100, la frequence d'echantilonnage (nombre de donnees par seconde)
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    local
@@ -118,13 +118,41 @@ local Mix Interprete Projet CWD in
 		  Audio
 	       end
 
-	       fun {Couper}
-		  Audio
-	       end	    
+%	       local Inter Note Silence DebutAi FinAi in
+%		  fun {Couper Debut Fin M}
+%		     Inter = Fin - Debut
+%		     if Inter < 0 then {Couper Fin Debut M} end
+%		     if Debut < 0 && Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}}
+%		     elseif Debut < 0 && Fin > 0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{Couper 0 Fin M}
+%		     else DebutAi = 44100 * Debut
+%			  FinAi = 44100 * Debut
+%			  fun {CouperAux DebutAi
+%			
+%		     end
+%		  end
+
+	       local Inter Silence Duree CouperAux d f in
+		  fun {Couper Debut Fin M}
+		     Inter = Fin - Debut
+		     if Inter < 0 then {Couper Fin Debut M} end
+		     if Debut < 0 && Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}}
+		     elseif Debut < 0 && Fin > 0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{CouperAux 0 Fin*44100 M}
+		     else {CouperAux Debut*44100 Fin*44100 M}
+			
+			fun {CouperAux d f M}
+			   if Fin == 0 then nil 
+			   elseif Debut == 0 then M.1|{Couper 0 Fin-1 M.2}
+			   else {Couper Debut-1 Fin-1 M.2}   
+			   end
+			end
+		     
+		     end
+		  end
+		  
+	       end
 	    end
 	 end
-      
-      
+	 
       % Interprete doit interpréter une partition
 	 fun {Interprete Partition}
 	    P={ToNote {Flatten Partition}}
@@ -163,7 +191,7 @@ local Mix Interprete Projet CWD in
 	    end
 	 end	       
 	    		  
-	 fun {ToEchantillon Note Duree}
+	 fun {ToEchantillon Note}
 	    local Nom C Hauteur in
 	       Nom = Note.nom
 	       if Nom == a then Hauteur = 0
@@ -178,7 +206,7 @@ local Mix Interprete Projet CWD in
 	       Hauteur = Hauteur + ((C-4*12))
 	       if Note.alteration == '#' then Hauteur = Hauteur + 1
 	       end
-	       echantillon = Note(hauteur:Hauteur duree:Duree instrument:none)	  
+	       echantillon = Note(hauteur:Hauteur duree:1 instrument:none)	  
 	    end
 	 end
 	       
