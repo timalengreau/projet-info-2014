@@ -56,8 +56,12 @@ local Mix Interprete Projet CWD in
 	    fun {Merge L}
 	       case L
 	       of nil then nil
-		  [] H|T then case H of I#M 
-	       end	       
+	       [] H|T then case H of I#M case M
+					 of nil then nil
+					 [] H|T then I*H|{}
+					 end	      
+			   end % PAS BON
+		  Audio 
 	    end
 
 	    fun {Renverser}
