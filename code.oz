@@ -27,7 +27,7 @@ local Mix Interprete Projet CWD in
 		     if I==0 then nil
 		     else
 			case hauteur
-			of 'H' then 0|{ToAudioAux 'H' N  I-1}
+			of 'H' then 0|{ToAudioAux 'H' N I-1}
 			[] H then local F A in
 				     F=2^(H div 12)*440
 				     A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
@@ -36,7 +36,7 @@ local Mix Interprete Projet CWD in
 			end
 		     end
 		  end
-	       
+		  
 		  n = 44100
 		  case Echantillon
 		  of silence(duree:s) then
@@ -52,8 +52,12 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 	    
-	 fun {Merge}
-	    Audio
+	 fun {Merge L}
+	    case L
+	    of nil then nil
+	    [] H|T then case H of I#M 
+			end	       
+	    end
 	 end
 
 	 fun {Renverser}
