@@ -1,4 +1,3 @@
-% Vous ne pouvez pas utiliser le mot-clé 'declare'.
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre système.
@@ -47,13 +46,13 @@ local Mix Interprete Projet CWD in
 	       case Partition
 	       of nil then nil
 	       [] H|T then case H
-			   of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:’#’)}  M|{ToNote T}
+			   of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
 			   [] Atom then
 			      case {AtomToString Atom}
 			      of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote P}
 			      [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote P}
 			      end
-			   [] H|{ToNote T}
+			   [] then  H|{ToNote T}
 			   end
 	       end
 	    end
