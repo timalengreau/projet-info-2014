@@ -52,19 +52,82 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 	    
-	% fun {Merge L}
-	%    case L
-	%    of nil then nil
-	%    [] H|T then case H of I#M then
-	%		   case M
-	%		   of nil then nil
-	%		   [] H|T then I*H|{}
-	%		   end	      
-	%		end % PAS BON
-	%    else nil
-	%       Audio 
-	%    end
-	% end
+	       fun {Merge L}
+		  local N Itot IntensiteTotale Intensifier AddList in
+		     N = {Length L 0}
+		     Itot = {IntensiteTotale L 0}
+
+		     if N==0 then nil
+		     elseif N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
+				      end
+		     elseif N==2 then local L1 L2 in
+					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+					 case L.2 of I#M then L2={Intensifier (I/Itot) M} end
+					 {AddList L1 L2}
+				      end
+			
+		     elseif N==3 then local L1 L2 L3 in
+					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+					 case L.2.2 of I#M then L3={Intensifier (I/Itot) M} end
+					 {AddList {AddList L1 L2} L3}
+				      end
+			
+		     elseif N==4 then local L1 L2 L3 L4 in
+					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+					 case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+					 case L.2.2.2 of I#M then L4={Intensifier (I/Itot) M} end
+					 {AddList {AddList {AddList L1 L2} L3} L4}
+				      end
+			
+		     elseif N==5 then local L1 L2 L3 L4 L5 in
+					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+					 case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+					 case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
+					 case L.2.2.2.2 of I#M then L5={Intensifier (I/Itot) M} end
+					 {AddList {AddList {AddList {AddList L1 L2} L3} L4} L5}
+				      end
+			
+		     elseif N==6 then local L1 L2 L3 L4 L5 L6 in
+					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+					 case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+					 case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
+					 case L.2.2.2.2.1 of I#M then L5={Intensifier (I/Itot) M} end
+					 case L.2.2.2.2.2 of I#M then L6={Intensifier (I/Itot) M} end
+					 {AddList {AddList {AddList {AddList {AddList L1 L2} L3} L4} L5} L6}
+				      end
+		     end
+			
+		     fun{IntensiteTotale L A}
+			case L of nil then A
+			[] H|T then case H of I#M then {IntensiteTotale T A+I}
+				    end
+			end
+		     end
+
+		     fun{Intensifier I M}
+			case M of nil then nil
+			[] H|T then (I*H)|{Intensifier I T}
+			end
+		     end
+
+		     fun{AddList L1 L2}
+			case L1
+			of nil then case L2
+				    of nil then nil
+				    [] H2|T2 then H2|{AddList L1 T2}
+				    end
+			[] H1|T1 then case L2
+				      of nil then H1|{AddList T1 L2}
+				      [] H2|T2 then (H1+H2)|{AddList T1 T2}
+				      end
+			end
+		     end	     
+		  end
+	       end
 
 	       fun {Renverser L A}
 %L est la liste à inverser, A un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
@@ -105,7 +168,7 @@ local Mix Interprete Projet CWD in
 			end
 		     end
 
-		     proc {$ I} {Intensite Decadence Repetition} end
+		     proc {$ I} {Intensite Decadence Repetition}=1 end
 
 		     fun {EchoAux D d R M A}
 			if A==R then nil
@@ -135,19 +198,6 @@ local Mix Interprete Projet CWD in
 	       fun {FonduEnchaine}
 		  Audio
 	       end
-
-%	       local Inter Note Silence DebutAi FinAi in
-%		  fun {Couper Debut Fin M}
-%		     Inter = Fin - Debut
-%		     if Inter < 0 then {Couper Fin Debut M} end
-%		     if Debut < 0 && Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}}
-%		     elseif Debut < 0 && Fin > 0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{Couper 0 Fin M}
-%		     else DebutAi = 44100 * Debut
-%			  FinAi = 44100 * Debut
-%			  fun {CouperAux DebutAi
-%			
-%		     end
-%		  end
 
 	       local Inter Silence Duree CouperAux d f in
 		  fun {Couper Debut Fin M}
