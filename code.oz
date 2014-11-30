@@ -31,7 +31,7 @@ local Mix Interprete Projet CWD in
 			   of 'H' then 0|{ToAudioAux 'H' N I-1}
 			   [] H then local F A in
 					F=2^(H div 12)*440
-					A=(0.5*{Sin ((2*3.14*F*(N-I+1)) div 44100)})
+					A=(0.5*{Sin ((2*3.14159265359*F*(N-I+1)) div 44100)})
 					A|{ToAudioAux H N I-1}
 				     end
 			   end
