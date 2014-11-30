@@ -16,7 +16,7 @@ local Mix Interprete Projet CWD in
    local
       Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
    in
-      local V P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
+      local V P Lire Length ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
       % Mix prends une musique et doit retourner un vecteur audio.
 	 fun {Mix Interprete Music}
 	 
@@ -98,7 +98,6 @@ local Mix Interprete Projet CWD in
 
 	       fun {Echo Delai Decadence Repetition Musique}
 		  local Intensite A I EchoAux in
-
 		     fun {Intensite d R}
 			if R == 0 then I
 			else I*d^R+{Intensite d R-1}
@@ -128,12 +127,31 @@ local Mix Interprete Projet CWD in
 		  end	    
 	       end
 
-	       fun {Fondu}
-		  Audio
+	       fun {Fondu Ouverture Fermeture M}
+		  local FonduAux in
+		     if Ouverture > 0 && {Length M 0} > 44100*Ouverture then {FonduAux M Ouverture*44100 1}
+		     end
+		     fun {FonduAux M Duree Acc}
+			if Acc == Duree then nil
+			else
+			   ((M.1*Acc)/Duree)|{FonduAux M.2 Duree Acc+1}
+			end
+		     end
+		     if Fermeture > 0 && {Length M 0} > 44100*Fermeture then {Renverser {FonduAux {Renverser M nil} Fermeture*Duree 1} nil}
+		     end
+		  end
 	       end
 
-	       fun {FonduEnchaine}
-		  Audio
+	       fun {FonduEnchaine Duree M1 M2}
+		  local Voix Silence in
+		     {Merge ([0.5#{Fondu Duree 0 M1} 0.5#{Fondu 0 Duree [Voix([Silence(({Length M1 0}/44100)-Duree)]) M2]}])}
+		  end
+	       end
+
+	       fun {Length List Acc}
+		  if List == nil then Acc
+		  else {Length List.2 Acc+1}
+		  end
 	       end
 
 %	       local Inter Note Silence DebutAi FinAi in
