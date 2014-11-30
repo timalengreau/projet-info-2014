@@ -24,15 +24,15 @@ local Mix Interprete Projet CWD in
 	    
 	       fun {ToAudio Echantillon}
 		  local ToAudioAux NbAiS in
-		     fun {ToAudioAux hauteur N I}
+		     fun {ToAudioAux Hauteur N I}
 			if I==0 then nil
 			else
-			   case hauteur
+			   case Hauteur
 			   of 'H' then 0|{ToAudioAux 'H' N I-1}
-			   [] H then local F A in
+			   [] H then local F Ai in
 					F=2^(H div 12)*440
-					A=(0.5*{Sin ((2*3.14159265359*F*(N-I+1)) div 44100)})
-					A|{ToAudioAux H N I-1}
+					Ai=(0.5*{Sin ((2*3.14159265359*F*(N-I+1)) div 44100)})
+					Ai|{ToAudioAux H N I-1}
 				     end
 			   end
 			end
@@ -42,9 +42,9 @@ local Mix Interprete Projet CWD in
 		     local NbAiTot in
 			case Echantillon
 			of silence(duree:S) then
-			   NbAiTot=NbAiS*S {ToAudioAux 'H' NbAiTot NbAiTot}
+			   NbAiTot = NbAiS*S {ToAudioAux 'H' NbAiTot NbAiTot}
 			[] echantillon(hauteur:H duree:S instrument:none) then
-			   NbAiTot=NbAiS*S {ToAudioAux H NbAiTot NbAiTot}
+			   NbAiTot = NbAiS*S {ToAudioAux H NbAiTot NbAiTot}
 			end
 		     end     
 		  end
@@ -99,9 +99,9 @@ local Mix Interprete Projet CWD in
 				      end
 		     end
 			
-		     fun{IntensiteTotale L A}
-			case L of nil then A
-			[] H|T then case H of I#M then {IntensiteTotale T A+I}
+		     fun{IntensiteTotale L Acc}
+			case L of nil then Acc
+			[] H|T then case H of I#M then {IntensiteTotale T Acc+I}
 				    end
 			end
 		     end
@@ -127,49 +127,49 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 
-	       fun {Renverser L A}
-%L est la liste à inverser, A un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
+	       fun {Renverser L Acc}
+%L est la liste à inverser, Acc un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
 		  case L
-		  of nil then A
-		  [] H|T then {Renverser T H|A}
+		  of nil then Acc
+		  [] H|T then {Renverser T H|Acc}
 		  end  
 	       end
 
-	       fun {RepetitionN N M}
-		  if N==0 then skip
-		  elseif N==1 then M   % = 1 ou 0 ?
-		  else if M==nil then {RepetitionN N-1 M}
-		       else M.1|{RepetitionN N M.2}
+	       fun {RepetitionN NbRep M}
+		  if NbRep==0 then skip
+		  elseif NbRep==1 then M   % = 1 ou 0 ?
+		  else if M==nil then {RepetitionN NbRep-1 M}
+		       else M.1|{RepetitionN NbRep M.2}
 		       end
 		  end	    
 	       end
 
-	       fun {RepetitionD D M}
-		  local N M1 M2 in
-		     N = {TempsTotal M 0} div D
-		     M1 = {RepetitionN N M}
-		     fun {M2 D M A}
-			if A+M.1.duree > D then nil
-			else M.1|{M2 D M.2 A+M.1.duree}
+	       fun {RepetitionD Duree M}
+		  local NbRep M1 M2 in
+		     NbRep = {TempsTotal M 0} div Duree
+		     M1 = {RepetitionN NbRep M}
+		     fun {M2 Duree M Acc}
+			if Acc+M.1.duree > Duree then nil
+			else M.1|{M2 Duree M.2 Acc+M.1.duree}
 			end		  
 		     end
-		     M1 + {M2 D M 0}
+		     M1 + {M2 Duree M 0}
 		  end
 	       end
 
 	       fun {Echo Delai Decadence Repetition Musique}
-		  local Intensite A I EchoAux in
-		     fun {Intensite d R}
-			if R == 0 then I
-			else I*d^R+{Intensite d R-1}
+		  local EquIntensite I EchoAux in
+		     fun {EquIntensite Dec Rep}
+			if Rep == 0 then 1
+			else Dec^Rep+{EquIntensite Dec Rep-1}
 			end
 		     end
 
-		     proc {$ I} {Intensite Decadence Repetition}=1 end
+		     I = 1/{EquIntensite Decadence Repetition}
 
-		     fun {EchoAux D d R M A}
-			if A==R then nil
-			else I^(A+1)#[voix[silence(duree:D*A)] M]|{EchoAux D d R A+1}
+		     fun {EchoAux Del Dec Rep M Acc}
+			if Acc==Rep then nil
+			else I^(Acc+1)#[voix[silence(duree:Del*Acc)] M]|{EchoAux Del Dec Rep Acc+1}
 			end
 		     end
 
@@ -223,10 +223,10 @@ local Mix Interprete Projet CWD in
 		     elseif Debut < 0 && Fin > 0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{CouperAux 0 Fin*44100 M}
 		     else {CouperAux Debut*44100 Fin*44100 M}
 			
-			fun {CouperAux d f M}
+			fun {CouperAux D F M}
 			   if Fin == 0 then nil 
-			   elseif Debut == 0 then M.1|{Couper 0 Fin-1 M.2}
-			   else {Couper Debut-1 Fin-1 M.2}   
+			   elseif Debut == 0 then M.1|{Couper 0 F-1 M.2}
+			   else {Couper D-1 F-1 M.2}   
 			   end
 			end
 		     
@@ -275,22 +275,22 @@ local Mix Interprete Projet CWD in
 	    end
 	 end	       
 	    		  
-	 fun {ToEchantillon Note}
-	    local Nom C Hauteur in
+	 fun {ToEchantillon Note} %Faire les silences /!\
+	    local Nom C Hauteur Echantillon in
 	       Nom = Note.nom
-	       if Nom == a then Hauteur = 0
-	       elseif Nom == b then Hauteur = 2
-	       elseif Nom == c then Hauteur = 3
-	       elseif Nom == d then Hauteur = 5
-	       elseif Nom == e then Hauteur = 7
-	       elseif Nom == f then Hauteur = 8
-	       elseif Nom == g then Hauteur = 10
+	       if Nom == 'a' then Hauteur = 0
+	       elseif Nom == 'b' then Hauteur = 2
+	       elseif Nom == 'c' then Hauteur = 3
+	       elseif Nom == 'd' then Hauteur = 5
+	       elseif Nom == 'e' then Hauteur = 7
+	       elseif Nom == 'f' then Hauteur = 8
+	       elseif Nom == 'g' then Hauteur = 10
 	       end
 	       C = Note.octave
-	       Hauteur = Hauteur + ((C-4*12))
+	       Hauteur = Hauteur + (((C-4)*12))
 	       if Note.alteration == '#' then Hauteur = Hauteur + 1
 	       end
-	       echantillon = Note(hauteur:Hauteur duree:1 instrument:none)	  
+	       Echantillon(hauteur:Hauteur duree:1 instrument:none)	  
 	    end
 	 end
 	       
@@ -310,15 +310,17 @@ local Mix Interprete Projet CWD in
 	 end
 	 
 	 fun {Etirer Facteur Partition}
-	    for I in Partition do
-	       I.duree = I.duree * Facteur %a verifier
+	    local Echantillon in
+	       case Partition of nil then nil
+	       [] H|T then Echantillon(hauteur:H.hauteur duree:(H.duree*Facteur) instrument:H.instrument)|{Etirer Facteur T}
+	       end
 	    end
 	 end
 
 	 fun {Transpose NbreDemiTons Note}
-	    local E in
+	    local E Echantillon in
 	       E = {ToEchantillon Note}
-	       E.hauteur = E.hauteur + NbreDemiTons %a verifier
+	       Echantillon(hauteur:(E.hauteur + NbreDemiTons) duree:E.duree instrument:E.instrument)
 	    end
 	 end
 
