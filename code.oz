@@ -23,7 +23,7 @@ local Mix Interprete Projet CWD in
 	    local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Couper in
 	    
 	       fun {ToAudio Echantillon}
-		  local ToAudioAux n in
+		  local ToAudioAux NbAiS in
 		     fun {ToAudioAux hauteur N I}
 			if I==0 then nil
 			else
@@ -31,22 +31,20 @@ local Mix Interprete Projet CWD in
 			   of 'H' then 0|{ToAudioAux 'H' N I-1}
 			   [] H then local F A in
 					F=2^(H div 12)*440
-					A=(0.5*{Sin 2*3.14*F*(N-I+1)} div 44100)
+					A=(0.5*{Sin ((2*3.14*F*(N-I+1)) div 44100)})
 					A|{ToAudioAux H N I-1}
 				     end
 			   end
 			end
 		     end
 		  
-		     n = 44100
-		     case Echantillon
-		     of silence(duree:s) then
-			local N in
-			   N=n*s {ToAudioAux 'H' N N}
-			end
-		     [] echantillon(hauteur:h duree:s instrument:none) then
-			local N in
-			   N=n*s {ToAudioAux h N N}
+		     NbAiS = 44100
+		     local NbAiTot in
+			case Echantillon
+			of silence(duree:S) then
+			   NbAiTot=NbAiS*S {ToAudioAux 'H' NbAiTot NbAiTot}
+			[] echantillon(hauteur:H duree:S instrument:none) then
+			   NbAiTot=NbAiS*S {ToAudioAux H NbAiTot NbAiTot}
 			end
 		     end     
 		  end
