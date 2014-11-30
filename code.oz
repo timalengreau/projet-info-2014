@@ -16,11 +16,11 @@ local Mix Interprete Projet CWD in
    local
       Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
    in
-      local V P Lire Length ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
+      local V P Lire ToNote ToEchantillon Duree TempsTotal Etirer Transpose Bourdon Muet in
       % Mix prends une musique et doit retourner un vecteur audio.
 	 fun {Mix Interprete Music}
 	 
-	    local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Couper in
+	    local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe in
 	    
 	       fun {ToAudio Echantillon}
 		  local ToAudioAux NbAiS in
@@ -51,24 +51,24 @@ local Mix Interprete Projet CWD in
 	       end
 	    
 	       fun {Merge L}
-		  local N Itot IntensiteTotale Intensifier AddList in
-		     N = {Length L 0}
+		  local N Itot IntensiteTotale Intensifier AdditionList in
+		     N = {Longueur L 0}
 		     Itot = {IntensiteTotale L 0}
 
-		     if N==0 then nil
-		     elseif N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
+		     %case L of nil then nil end
+		     if N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
 				      end
 		     elseif N==2 then local L1 L2 in
 					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
 					 case L.2 of I#M then L2={Intensifier (I/Itot) M} end
-					 {AddList L1 L2}
+					 {AdditionList L1 L2}
 				      end
 			
 		     elseif N==3 then local L1 L2 L3 in
 					 case L.1 of I#M then L1={Intensifier (I/Itot) M} end
 					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
 					 case L.2.2 of I#M then L3={Intensifier (I/Itot) M} end
-					 {AddList {AddList L1 L2} L3}
+					 {AdditionList {AdditionList L1 L2} L3}
 				      end
 			
 		     elseif N==4 then local L1 L2 L3 L4 in
@@ -76,7 +76,7 @@ local Mix Interprete Projet CWD in
 					 case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
 					 case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
 					 case L.2.2.2 of I#M then L4={Intensifier (I/Itot) M} end
-					 {AddList {AddList {AddList L1 L2} L3} L4}
+					 {AdditionList {AdditionList {AdditionList L1 L2} L3} L4}
 				      end
 			
 		     elseif N==5 then local L1 L2 L3 L4 L5 in
@@ -85,7 +85,7 @@ local Mix Interprete Projet CWD in
 					 case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
 					 case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
 					 case L.2.2.2.2 of I#M then L5={Intensifier (I/Itot) M} end
-					 {AddList {AddList {AddList {AddList L1 L2} L3} L4} L5}
+					 {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5}
 				      end
 			
 		     elseif N==6 then local L1 L2 L3 L4 L5 L6 in
@@ -95,35 +95,36 @@ local Mix Interprete Projet CWD in
 					 case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
 					 case L.2.2.2.2.1 of I#M then L5={Intensifier (I/Itot) M} end
 					 case L.2.2.2.2.2 of I#M then L6={Intensifier (I/Itot) M} end
-					 {AddList {AddList {AddList {AddList {AddList L1 L2} L3} L4} L5} L6}
+					 {AdditionList {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5} L6}
 				      end
 		     end
 			
-		     fun{IntensiteTotale L Acc}
+		     fun {IntensiteTotale L Acc}
 			case L of nil then Acc
 			[] H|T then case H of I#M then {IntensiteTotale T Acc+I}
 				    end
 			end
 		     end
 
-		     fun{Intensifier I M}
+		     fun {Intensifier I M}
 			case M of nil then nil
 			[] H|T then (I*H)|{Intensifier I T}
 			end
 		     end
 
-		     fun{AddList L1 L2}
+		     fun {AdditionList L1 L2}
 			case L1
 			of nil then case L2
 				    of nil then nil
-				    [] H2|T2 then H2|{AddList L1 T2}
+				    [] H2|T2 then H2|{AdditionList L1 T2}
 				    end
 			[] H1|T1 then case L2
-				      of nil then H1|{AddList T1 L2}
-				      [] H2|T2 then (H1+H2)|{AddList T1 T2}
+				      of nil then H1|{AdditionList T1 L2}
+				      [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
 				      end
 			end
-		     end	     
+		     end
+		     
 		  end
 	       end
 
@@ -136,8 +137,7 @@ local Mix Interprete Projet CWD in
 	       end
 
 	       fun {RepetitionN NbRep M}
-		  if NbRep==0 then skip
-		  elseif NbRep==1 then M   % = 1 ou 0 ?
+		  if NbRep==0 then M
 		  else if M==nil then {RepetitionN NbRep-1 M}
 		       else M.1|{RepetitionN NbRep M.2}
 		       end
@@ -190,7 +190,8 @@ local Mix Interprete Projet CWD in
 
 	       fun {Fondu Ouverture Fermeture M}
 		  local FonduAux in
-		     if Ouverture > 0 && {Length M 0} > 44100*Ouverture then {FonduAux M Ouverture*44100 1}
+		     if Ouverture > 0 then if {Longueur M 0} > (44100*Ouverture) then {FonduAux M Ouverture*44100 1}
+					   end
 		     end
 		     fun {FonduAux M Duree Acc}
 			if Acc == Duree then nil
@@ -198,42 +199,43 @@ local Mix Interprete Projet CWD in
 			   ((M.1*Acc)/Duree)|{FonduAux M.2 Duree Acc+1}
 			end
 		     end
-		     if Fermeture > 0 && {Length M 0} > 44100*Fermeture then {Renverser {FonduAux {Renverser M nil} Fermeture*Duree 1} nil}
+		     if Fermeture > 0 then if {Longueur M 0} > (44100*Fermeture) then {Renverser {FonduAux {Renverser M nil} Fermeture*Duree 1} nil}
+					   end
 		     end
 		  end
 	       end
 
 	       fun {FonduEnchaine Duree M1 M2}
 		  local Voix Silence in
-		     {Merge ([0.5#{Fondu Duree 0 M1} 0.5#{Fondu 0 Duree [Voix([Silence(({Length M1 0}/44100)-Duree)]) M2]}])}
+		     {Merge ([0.5#{Fondu Duree 0 M1} 0.5#{Fondu 0 Duree [Voix([Silence(({Longueur M1 0}/44100)-Duree)]) M2]}])}
 		  end
 	       end
 
-	       fun {Length List Acc}
-		  if List == nil then Acc
-		  else {Length List.2 Acc+1}
+	       fun {Longueur List Acc}
+		  case List of nil then Acc
+		  else {Longueur List.2 Acc+1}
 		  end
 	       end
 
-	       local Inter Silence Duree CouperAux d f in
-		  fun {Couper Debut Fin M}
+	       fun {Coupe Debut Fin M}
+		  local Inter Silence Duree CoupeAux D F in
 		     Inter = Fin - Debut
-		     if Inter < 0 then {Couper Fin Debut M} end
-		     if Debut < 0 && Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}}
-		     elseif Debut < 0 && Fin > 0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{CouperAux 0 Fin*44100 M}
-		     else {CouperAux Debut*44100 Fin*44100 M}
-			
-			fun {CouperAux D F M}
-			   if Fin == 0 then nil 
-			   elseif Debut == 0 then M.1|{Couper 0 F-1 M.2}
-			   else {Couper D-1 F-1 M.2}   
-			   end
-			end
-		     
+		     if Inter < 0 then {Coupe Fin Debut M} end
+		     if Debut < 0 then if Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
+		     elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 M} end
+		     else {CoupeAux Debut*44100 Fin*44100 M}
 		     end
+			
+		     fun {CoupeAux D F M}
+			if Fin == 0 then nil 
+			elseif Debut == 0 then M.1|{Coupe 0 F-1 M.2}
+			else {Coupe D-1 F-1 M.2}   
+			end
+		     end
+		     
 		  end
-		  
 	       end
+		  
 	    end
 	 end
 	 
