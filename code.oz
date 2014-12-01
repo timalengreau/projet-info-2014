@@ -197,7 +197,7 @@ local Mix Interprete Projet CWD in
 	       end
 	    end
 
-	    fun {Echo Delai Decadence Repetition Musique}
+	    fun {Echo Delai Decadence Repetition Audio}
 	       local EquIntensite I EchoAux in
 		  fun {EquIntensite Dec Rep}
 		     if Rep == 0 then 1
@@ -213,7 +213,7 @@ local Mix Interprete Projet CWD in
 		     end
 		  end
 
-		  {EchoAux Delai Decadence Repetition Musique 0}
+		  {EchoAux Delai Decadence Repetition Audio 0}
 
 	       end
 	    end
@@ -228,26 +228,26 @@ local Mix Interprete Projet CWD in
 	       end	    
 	    end
 
-	    fun {Fondu Ouverture Fermeture M}
+	    fun {Fondu Ouverture Fermeture Audio}
 	       local FonduAux in
-		  if Ouverture > 0 then if {Longueur M 0} > (44100*Ouverture) then {FonduAux M Ouverture*44100 1}
+		  if Ouverture > 0 then if {Longueur Audio 0} > (44100*Ouverture) then {FonduAux Audio Ouverture*44100 1}
 					end
 		  end
-		  fun {FonduAux M Duree Acc}
+		  fun {FonduAux Audio Duree Acc}
 		     if Acc == Duree then nil
 		     else
-			((M.1*Acc)/Duree)|{FonduAux M.2 Duree Acc+1}
+			((Audio.1*Acc)/Duree)|{FonduAux Audio.2 Duree Acc+1}
 		     end
 		  end
-		  if Fermeture > 0 then if {Longueur M 0} > (44100*Fermeture) then {Renverser {FonduAux {Renverser M nil} Fermeture*Duree 1} nil}
+		  if Fermeture > 0 then if {Longueur Audio 0} > (44100*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1} nil}
 					end
 		  end
 	       end
 	    end
 
-	    fun {FonduEnchaine Duree M1 M2}
+	    fun {FonduEnchaine Duree Audio1 Audio2}
 	       local Voix Silence in
-		  {Merge ([0.5#{Fondu Duree 0 M1} 0.5#{Fondu 0 Duree [Voix([Silence(({Longueur M1 0}/44100)-Duree)]) M2]}])}
+		  {Merge ([0.5#{Fondu Duree 0 Audio1} 0.5#{Fondu 0 Duree [Voix([Silence(({Longueur Audio1 0}/44100)-Duree)]) Audio2]}])}
 	       end
 	    end
 
@@ -257,20 +257,20 @@ local Mix Interprete Projet CWD in
 	       end
 	    end
 	    
-	    fun {Coupe Debut Fin M}
+	    fun {Coupe Debut Fin Audio}
 	       local Inter Silence Duree CoupeAux D F in
-		  fun {CoupeAux D F M}
+		  fun {CoupeAux D F Audio}
 		     if Fin == 0 then nil
-		     elseif Debut == 0 then M.1|{Coupe 0 F-1 M.2}
-		     else {Coupe D-1 F-1 M.2}   
+		     elseif Debut == 0 then Audio.1|{Coupe 0 F-1 Audio.2}
+		     else {Coupe D-1 F-1 Audio.2}   
 		     end
 		  end
 		     
 		  Inter = Fin - Debut
-		  if Inter < 0 then {Coupe Fin Debut M} end
+		  if Inter < 0 then {Coupe Fin Debut Audio} end
 		  if Debut < 0 then if Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
-		  elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 M} end
-		  else {CoupeAux Debut*44100 Fin*44100 M}
+		  elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 Audio} end
+		  else {CoupeAux Debut*44100 Fin*44100 Audio}
 		  end
 	       end
 	    end
@@ -281,10 +281,10 @@ local Mix Interprete Projet CWD in
       fun {Interprete Partition}
 	 local P Lire Transpose Bourdon Muet in
 
-	    fun {Transpose NbreDemiTons Note}
-	       local E in
-		  E = {ToEchantillon Note}
-		  echantillon(hauteur:(E.hauteur + NbreDemiTons) duree:E.duree instrument:E.instrument)
+	    fun {Transpose NbreDemiTons Partition}
+	       case Partition
+	       of nil then nil
+	       [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
 	       end
 	    end
 
@@ -296,8 +296,7 @@ local Mix Interprete Projet CWD in
 	    end
 
 	    fun {Muet Partition}
-	      % {Bourdon silence Partition}
-	       0
+	      {Bourdon 'silence' Partition}
 	    end
 	    
 	    fun {Lire Partition}
