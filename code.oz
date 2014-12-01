@@ -55,6 +55,32 @@ local Mix Interprete Projet CWD in
 		     N = {Longueur L 0}
 		     Itot = {IntensiteTotale L 0}
 
+		     fun {IntensiteTotale L Acc}
+			case L of nil then Acc
+			[] H|T then case H of I#M then {IntensiteTotale T Acc+I}
+				    end
+			end
+		     end
+
+		     fun {Intensifier I M}
+			case M of nil then nil
+			[] H|T then (I*H)|{Intensifier I T}
+			end
+		     end
+
+		     fun {AdditionList L1 L2}
+			case L1
+			of nil then case L2
+				    of nil then nil
+				    [] H2|T2 then H2|{AdditionList L1 T2}
+				    end
+			[] H1|T1 then case L2
+				      of nil then H1|{AdditionList T1 L2}
+				      [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
+				      end
+			end
+		     end
+		     
 		     %case L of nil then nil end
 		     if N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
 				      end
@@ -98,33 +124,6 @@ local Mix Interprete Projet CWD in
 					 {AdditionList {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5} L6}
 				      end
 		     end
-			
-		     fun {IntensiteTotale L Acc}
-			case L of nil then Acc
-			[] H|T then case H of I#M then {IntensiteTotale T Acc+I}
-				    end
-			end
-		     end
-
-		     fun {Intensifier I M}
-			case M of nil then nil
-			[] H|T then (I*H)|{Intensifier I T}
-			end
-		     end
-
-		     fun {AdditionList L1 L2}
-			case L1
-			of nil then case L2
-				    of nil then nil
-				    [] H2|T2 then H2|{AdditionList L1 T2}
-				    end
-			[] H1|T1 then case L2
-				      of nil then H1|{AdditionList T1 L2}
-				      [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
-				      end
-			end
-		     end
-		     
 		  end
 	       end
 
@@ -219,20 +218,19 @@ local Mix Interprete Projet CWD in
 
 	       fun {Coupe Debut Fin M}
 		  local Inter Silence Duree CoupeAux D F in
+		     fun {CoupeAux D F M}
+			if Fin == 0 then nil
+			elseif Debut == 0 then M.1|{Coupe 0 F-1 M.2}
+			else {Coupe D-1 F-1 M.2}   
+			end
+		     end
+		     
 		     Inter = Fin - Debut
 		     if Inter < 0 then {Coupe Fin Debut M} end
 		     if Debut < 0 then if Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
 		     elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 M} end
 		     else {CoupeAux Debut*44100 Fin*44100 M}
 		     end
-			
-		     fun {CoupeAux D F M}
-			if Fin == 0 then nil 
-			elseif Debut == 0 then M.1|{Coupe 0 F-1 M.2}
-			else {Coupe D-1 F-1 M.2}   
-			end
-		     end
-		     
 		  end
 	       end
 		  
