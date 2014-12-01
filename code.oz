@@ -80,7 +80,31 @@ local Mix Interprete Projet CWD in
 
       %Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
-	 local ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe in
+	 local M Final  ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe in
+
+	    fun {Final M}
+	       case M
+	       of nil then nil
+	       [] H|T then case H of voix(Voix) then Voix|{Final T}
+			   [] partition(Partition) then {ToAudio {Interprete Partition}}|{Final T}
+			   [] wave(Fichier) then {Projet.readFile CWD#'Fichier'}|{Final T}
+			   [] renverser(Musique) then {ToAudio {Renverser {Mix Interprete Musique}}}|{Final T}
+			   [] repetition(nombre:N Musique) then {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
+			   [] repetition(duree:S Musique) then {ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
+			   [] clip(bas:Bas haut:Haut Musique) then {Clip Bas Haut {To Audio {Mix Interprete Musique}}}|{Final T}
+			   [] echo(delai:S Musique) then {Echo S 1 1 {ToAudio {Mix Interprete Musique}}}|{Final T} 
+			   [] echo(delai:S decadence:D Musique) then {Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			   [] echo(delai:S decadence:D repetition:R Musique) then {Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
+			   [] fondu(ouverture:Ouv fermeture:Ferm Musique) then {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
+			   [] fondu_enchaine(duree:S Musique1 Musique2) then {FonduEchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
+			   [] couper(debut:Debut fin:Fin Musique) then {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}
+			   [] merge(MusiquesAvecIntensites) then {Merge MusiquesAvecIntensites}|{Final T}
+			   end
+	       end
+	    end
+	    
+		  
+			      
 	    
 	    fun {ToAudio ListeEchantillons}
 	       local ToAudioAux NbAiS  NbAiTot in
@@ -274,6 +298,10 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 	    end
+
+	    M = {Flatten Music}
+	    {Final M}
+	    
 	 end
       end
       	 
