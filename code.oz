@@ -127,93 +127,93 @@ local Mix Interprete Projet CWD in
 				 end
 		     end
 		  end
-	       end
 
-	       fun {IntensifierMusic I M}
-		  local Maudio in
-		     Maudio = {ToAudio M}
-		     case Maudio of nil then nil
-		     [] H|T then (I*H)|{Intensifier I T}
+		  fun {IntensifierMusic I M}
+		     local Maudio in
+			Maudio = {ToAudio M}
+			case Maudio of nil then nil
+			[] H|T then (I*H)|{IntensifierMusic I T}
+			end
 		     end
 		  end
-	       end
 
-	       fun {IntensifierList L}
-		  case L of nil then nil
-		  [] H|T then case H of I#M then {IntensifierMusic (I/Itot) M}|{IntensifierList T}
-			      end
+		  fun {IntensifierList L}
+		     case L of nil then nil
+		     [] H|T then case H of I#M then {IntensifierMusic (I/Itot) M}|{IntensifierList T}
+				 end
+		     end
 		  end
-	       end
 		     
 
-	       fun {AdditionList L1 L2}
-		  case L1
-		  of nil then case L2
-			      of nil then nil
-			      else L2
+		  fun {AdditionList L1 L2}
+		     case L1
+		     of nil then case L2
+				 of nil then nil
+				 else L2
                                     %[] H2|T2 then H2|{AdditionList L1 T2}
-			      end
-		  [] H1|T1 then case L2
-				of nil then L1
+				 end
+		     [] H1|T1 then case L2
+				   of nil then L1
 				      %of nil then H1|{AdditionList T1 L2}
-				[] H2|T2 then (H1+H2)|{AdditionList T1 T2}
-				end
+				   [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
+				   end
+		     end
 		  end
-	       end
 
-	       fun {Somme L}
-		  case L of H|nil then H
-		  [] H1|H2|T then {Somme {AdditionList H1 H2}|T}
-		  end 
-	       end
+		  fun {Somme L}
+		     case L of H|nil then H
+		     [] H1|H2|T then {Somme {AdditionList H1 H2}|T}
+		     end 
+		  end
 		     
-	       /*    case L of nil then nil end
-	       if N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
-			    end
-	       elseif N==2 then local L1 L2 in
-				   case L.1 of I#M then L1={Intensifier (I/Itot) M} end
-				   case L.2 of I#M then L2={Intensifier (I/Itot) M} end
-				   {AdditionList L1 L2}
-				end
+		  /*    case L of nil then nil end
+		  if N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
+			       end
+		  elseif N==2 then local L1 L2 in
+				      case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+				      case L.2 of I#M then L2={Intensifier (I/Itot) M} end
+				      {AdditionList L1 L2}
+				   end
 			
-	       elseif N==3 then local L1 L2 L3 in
-				   case L.1 of I#M then L1={Intensifier (I/Itot) M} end
-				   case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
-				   case L.2.2 of I#M then L3={Intensifier (I/Itot) M} end
-				   {AdditionList {AdditionList L1 L2} L3}
-				end
+		  elseif N==3 then local L1 L2 L3 in
+				      case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+				      case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+				      case L.2.2 of I#M then L3={Intensifier (I/Itot) M} end
+				      {AdditionList {AdditionList L1 L2} L3}
+				   end
 			
-	       elseif N==4 then local L1 L2 L3 L4 in
-				   case L.1 of I#M then L1={Intensifier (I/Itot) M} end
-				   case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
-				   case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
-				   case L.2.2.2 of I#M then L4={Intensifier (I/Itot) M} end
-				   {AdditionList {AdditionList {AdditionList L1 L2} L3} L4}
-				end
+		  elseif N==4 then local L1 L2 L3 L4 in
+				      case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+				      case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+				      case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+				      case L.2.2.2 of I#M then L4={Intensifier (I/Itot) M} end
+				      {AdditionList {AdditionList {AdditionList L1 L2} L3} L4}
+				   end
 			
-	       elseif N==5 then local L1 L2 L3 L4 L5 in
-				   case L.1 of I#M then L1={Intensifier (I/Itot) M} end
-				   case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
-				   case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
-				   case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
-				   case L.2.2.2.2 of I#M then L5={Intensifier (I/Itot) M} end
-				   {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5}
-				end
+		  elseif N==5 then local L1 L2 L3 L4 L5 in
+				      case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+				      case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+				      case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+				      case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
+				      case L.2.2.2.2 of I#M then L5={Intensifier (I/Itot) M} end
+				      {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5}
+				   end
 			
-	       elseif N==6 then local L1 L2 L3 L4 L5 L6 in
-				   case L.1 of I#M then L1={Intensifier (I/Itot) M} end
-				   case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
-				   case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
-				   case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
-				   case L.2.2.2.2.1 of I#M then L5={Intensifier (I/Itot) M} end
-				   case L.2.2.2.2.2 of I#M then L6={Intensifier (I/Itot) M} end
-				   {AdditionList {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5} L6}
-				end
+		  elseif N==6 then local L1 L2 L3 L4 L5 L6 in
+				      case L.1 of I#M then L1={Intensifier (I/Itot) M} end
+				      case L.2.1 of I#M then L2={Intensifier (I/Itot) M} end
+				      case L.2.2.1 of I#M then L3={Intensifier (I/Itot) M} end
+				      case L.2.2.2.1 of I#M then L4={Intensifier (I/Itot) M} end
+				      case L.2.2.2.2.1 of I#M then L5={Intensifier (I/Itot) M} end
+				      case L.2.2.2.2.2 of I#M then L6={Intensifier (I/Itot) M} end
+				      {AdditionList {AdditionList {AdditionList {AdditionList {AdditionList L1 L2} L3} L4} L5} L6}
+				   end
 
-	       end */
+		  end */
 
+	       end
 	    end
-
+	    
 	    fun {Renverser L Acc}
 %L est la liste à inverser, Acc un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
 	       case L
@@ -321,7 +321,6 @@ local Mix Interprete Projet CWD in
 		 end*/
 	       0
 	    end
-	    ListeEchantillons = {Interprete Music}
 	 end
       end
       	 
