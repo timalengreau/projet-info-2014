@@ -256,7 +256,7 @@ local Mix Interprete Projet CWD in
 	       else {Longueur List.2 Acc+1}
 	       end
 	    end
-	    /*
+	    
 	    fun {Coupe Debut Fin M}
 	       local Inter Silence Duree CoupeAux D F in
 		  fun {CoupeAux D F M}
@@ -274,7 +274,6 @@ local Mix Interprete Projet CWD in
 		  end
 	       end
 	    end
-	    */
 	 end
       end
       	 
