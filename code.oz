@@ -325,21 +325,7 @@ local Mix Interprete Projet CWD in
       % Interprete doit interpreter une partition
       fun {Interprete Partition}
 	 local P Lire Transpose Bourdon Muet in
-	    
-	    fun {Lire Partition}
-	       case Partition
-	       of nil then nil
-	       [] H|T then case H  
-			   of muet(Part) then {Muet {Interprete Part} nil}
-			   [] duree(secondes:S Part) then {Duree S {Interprete Part} nil}
-			   [] etirer(facteur:F Part) then {Etirer F {Interprete Part} nil}
-			   [] bourdon(note:N Part) then {Bourdon N {Interprete Part} nil}
-			   [] transpose(demitons:E Part) then {Transpose E {Interprete Part} nil}
-			   end
-		  H|{Lire T}
-	       end
-	    end	       
-	    		  
+
 	    fun {Transpose NbreDemiTons Note}
 	       local E in
 		  E = {ToEchantillon Note}
@@ -359,6 +345,20 @@ local Mix Interprete Projet CWD in
 	       0
 	    end
 	    
+	    fun {Lire Partition}
+	       case Partition
+	       of nil then nil
+	       [] H|T then case H  
+			   of muet(Part) then {Muet {Interprete Part}}
+			   [] duree(secondes:S Part) then {Duree S {Interprete Part}}
+			   [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
+			   [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
+			   [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
+			   end
+		  H|{Lire T}
+	       end
+	    end	       
+	    		 
 	    P={ToNote {Flatten Partition}}
 	    {Lire P}
 
