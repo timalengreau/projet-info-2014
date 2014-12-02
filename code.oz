@@ -125,10 +125,10 @@ local Mix Interprete Projet CWD in
 	    of nil then nil
 	    [] H|T then case H
 			of silence(duree:S) then
-			   {FloatToInt (NbAiTot = NbAiS*S)}
+			   NbAiTot = {FloatToInt NbAiS*S}
 			   {ToAudioAux 'silence' NbAiTot NbAiTot}|{ToAudio T}
 			[] echantillon(hauteur:H duree:S instrument:none) then
-			   {FloatToInt (NbAiTot = NbAiS*S)}
+			   NbAiTot = {FloatToInt NbAiS*S}
 			   {ToAudioAux H NbAiTot NbAiTot}|{ToAudio T}
 			end
 	    end
