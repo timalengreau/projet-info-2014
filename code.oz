@@ -3,7 +3,7 @@ local Mix Interprete Projet CWD in
    % modifiez sa valeur pour correspondre à votre systeme.
 
    %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    % Projet fournit quatre fonctions :
    % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
@@ -61,6 +61,7 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
       fun {Etirer Facteur Partition}
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:(H.duree*Facteur) instrument:H.instrument)|{Etirer Facteur T}
+	 [] H then echantillon(hauteur:H.hauteur duree:(H.duree*Facteur) instrument:H.instrument)
 	 end
       end
       
@@ -77,6 +78,15 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 			   end
 			else  H|{ToNote T}
 			end
+	    [] H
+	    then case H
+		 of Nom#Octave then {ToEchantillon note(nom:Nom octave:Octave alteration:'#')}
+		 [] Atom then
+		    case {AtomToString Atom}
+		    of [N] then {ToEchantillon note(nom:Atom octave:4 alteration:none)}
+		    [] [N O] then {ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)}
+		    end
+		 end
 	    end
 	 end
       end
@@ -96,8 +106,8 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 		     [] echo(delai:S Musique) then {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T} 
 		     [] echo(delai:S decadence:D Musique) then {Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
 		     [] echo(delai:S decadence:D repetition:R Musique) then {Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
-		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
-		     [] fondu_enchaine(duree:S Musique1 Musique2) then {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
+%		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
+%		     [] fondu_enchaine(duree:S Musique1 Musique2) then {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
 		     [] couper(debut:Debut fin:Fin Musique) then {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
 		     [] merge(MusiquesAvecIntensites) then {Merge MusiquesAvecIntensites}|{Final T}
 		     end
@@ -108,7 +118,8 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 	 local ToAudioAux NbAiS  NbAiTot in
 		     
 	    fun {ToAudioAux Hauteur N I}
-	       if I == 0.0 then nil
+
+	       if I == 0 then nil
 	       else
 		  case Hauteur
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1.0}
@@ -250,27 +261,30 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 	 end	    
       end
 
-      fun {Fondu Ouverture Fermeture Audio}
-	 local FonduAux in
-	    if Ouverture > 0.0 then if {Longueur Audio 0} > (44100.0*Ouverture) then {FonduAux Audio Ouverture*44100.0 1.0}
-				    end
-	    end
-	    fun {FonduAux Audio Duree Acc}
-	       if Acc == Duree then nil
-	       else
-		  ((Audio.1*Acc)/Duree)|{FonduAux Audio.2 Duree Acc+1.0}
+      /* fun {Fondu Ouverture Fermeture Audio}
+	    local FonduAux in
+    
+	       fun {FonduAux A Duree Acc}
+		  if Acc > Duree then A
+		  else
+		     ((A.1*Acc)/Duree)|{FonduAux A.2 Duree Acc+1.0}
+		  end
+	       end
+
+	       if Ouverture > 0.0 then if {Longueur Audio 0} > (44100.0*Ouverture) then {FonduAux Audio (Ouverture*44100.0) 1.0}
+				       end
+	       end
+	
+	       if Fermeture > 0.0 then if {Longueur Audio 0} > (44100.0*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
+				       end
 	       end
 	    end
-	    if Fermeture > 0.0 then if {Longueur Audio 0} > (44100.0*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
-				    end
-	    end
 	 end
-      end
 
       fun {FonduEnchaine Duree Audio1 Audio2}
-	    {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
+	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
-
+      */
       fun {Longueur List Acc}
 	 case List of nil then Acc
 	 else {Longueur List.2 Acc+1}
@@ -322,13 +336,22 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 		     [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}|{Lire T}
 		     [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}|{Lire T}
 		     [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}|{Lire T}
+		     else {ToNote H}|{Lire T}
 		     end
+	 [] H then case H
+		   of muet(Part) then {Muet {Interprete Part}}
+		   [] duree(secondes:S Part) then {Duree S {Interprete Part}}
+		   [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
+		   [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
+		   [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
+		   else {ToNote H}
+		   end
 	 end
       end
       
       fun {Interprete Partition}
 	 local P in
-	    P={ToNote {Flatten Partition}}
+	    P={Flatten Partition}
 	    {Lire P}
 	 end
       end
