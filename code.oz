@@ -98,20 +98,48 @@ local Mix Interprete Projet CWD in
       fun {Final M}
 	 case M
 	 of nil then nil
-	 [] H|T then case H of voix(Voix) then Voix|{Final T}
-		     [] partition(Partition) then {ToAudio {Interprete Partition}}|{Final T}
-		     [] wave(Fichier) then {Projet.readFile CWD#Fichier}|{Final T}
-		     [] renverser(Musique) then {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
-		     [] repetition(nombre:N Musique) then {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
-		     [] repetition(duree:S Musique) then {ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
-		     [] clip(bas:Bas haut:Haut Musique) then {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
-		     [] echo(delai:S Musique) then {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T} 
-		     [] echo(delai:S decadence:D Musique) then {Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
-		     [] echo(delai:S decadence:D repetition:R Musique) then {Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
-%		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
-%		     [] fondu_enchaine(duree:S Musique1 Musique2) then {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
-		     [] couper(debut:Debut fin:Fin Musique) then {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
-		     [] merge(MusiquesAvecIntensites) then {Merge MusiquesAvecIntensites}|{Final T}
+	 [] H|T then case H
+		     of	voix(Voix) then Voix|{Final T}
+			
+		     [] partition(Partition) then
+			{ToAudio {Interprete Partition}}|{Final T}
+			
+		     [] wave(Fichier) then
+			{Projet.readFile CWD#Fichier}|{Final T}
+			
+		     [] renverser(Musique) then
+			{ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
+			
+		     [] repetition(nombre:N Musique) then
+			{ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
+			
+		     [] repetition(duree:S Musique) then
+			{ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
+			
+		     [] clip(bas:Bas haut:Haut Musique) then
+			{Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+			
+		     [] echo(delai:S Musique) then
+			{Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+		     [] echo(delai:S decadence:D Musique) then
+			{Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+		     [] echo(delai:S decadence:D repetition:R Musique) then
+			{Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then
+			{Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+		     [] fondu_enchaine(duree:S Musique1 Musique2) then
+			{FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
+			
+		     [] couper(debut:Debut fin:Fin Musique) then
+			{Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
+			
+		     [] merge(MusiquesAvecIntensites) then
+			{Merge MusiquesAvecIntensites}|{Final T}
 		     end
 	 end
       end
@@ -121,13 +149,13 @@ local Mix Interprete Projet CWD in
 	    
 	    fun {ToAudioAux Hauteur N I}
 	       
-	       if I == 0 then nil
+	       if {IntToFloat I} == 0.0 then nil
 	       else
 		  case Hauteur
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
 		  [] H then local F Ai in
-			       F=2^(H / 12)*440.0
-			       Ai=(0.5*{Sin ((2.0*3.14159265359*F*(N-{IntToFloat I}+1.0)) / 44100.0)})
+			       F = {Number.pow 2.0 ({IntToFloat H}/12.0)} * 440.0
+			       Ai = (0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)})
 			       Ai|{ToAudioAux H N I-1}
 			    end
 		  end
