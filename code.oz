@@ -62,8 +62,8 @@ local Mix Interprete Projet CWD in
 	 
       fun {Etirer Facteur Partition}
 	 case Partition of nil then nil
-	 [] H|T then echantillon(hauteur:H.hauteur duree:(H.duree*Facteur) instrument:H.instrument)|{Etirer Facteur T}
-	 [] H then echantillon(hauteur:H.hauteur duree:(H.duree*Facteur) instrument:H.instrument)
+	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
+	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)
 	 end
       end
       
@@ -95,75 +95,77 @@ local Mix Interprete Projet CWD in
 
       %Mix prends une musique et doit retourner un vecteur audio.
 
-      fun {Final M}
-	 case M
-	 of nil then nil
-	 [] H|T then case H
-		     of	voix(Voix) then Voix|{Final T}
+      fun {Final Mrecu}
+	 local M in
+	    M = {Flatten Mrecu}
+	    case M
+	    of nil then nil
+	    [] H|T then case H
+			of voix(Voix) then Voix|{Final T}
 			
-		     [] partition(Partition) then
-			{ToAudio {Interprete Partition}}|{Final T}
+			[] partition(Partition) then
+			   {ToAudio {Interprete Partition}}|{Final T}
 			
-		     [] wave(Fichier) then
-			{Projet.readFile CWD#Fichier}|{Final T}
+			[] wave(Fichier) then
+			   {Projet.readFile CWD#Fichier}|{Final T}
 			
-		     [] renverser(Musique) then
-			{ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
+			[] renverser(Musique) then
+			   {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
 			
-		     [] repetition(nombre:N Musique) then
-			{ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
+			[] repetition(nombre:N Musique) then
+			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
 			
-		     [] repetition(duree:S Musique) then
-			{ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
+			[] repetition(duree:S Musique) then
+			   {ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
 			
-		     [] clip(bas:Bas haut:Haut Musique) then
-			{Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] clip(bas:Bas haut:Haut Musique) then
+			   {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
 			
-		     [] echo(delai:S Musique) then
-			{Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] echo(delai:S Musique) then
+			   {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
-		     [] echo(delai:S decadence:D Musique) then
-			{Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] echo(delai:S decadence:D Musique) then
+			   {Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
-		     [] echo(delai:S decadence:D repetition:R Musique) then
-			{Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] echo(delai:S decadence:D repetition:R Musique) then
+			   {Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
-		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then
-			{Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] fondu(ouverture:Ouv fermeture:Ferm Musique) then
+			   {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
-		     [] fondu_enchaine(duree:S Musique1 Musique2) then
-			{FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
+			[] fondu_enchaine(duree:S Musique1 Musique2) then
+			   {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
 			
-		     [] couper(debut:Debut fin:Fin Musique) then
-			{Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
+			[] couper(debut:Debut fin:Fin Musique) then
+			   {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
-		     [] merge(MusiquesAvecIntensites) then
-			{Merge MusiquesAvecIntensites}|{Final T}
-		     end
+			[] merge(MusiquesAvecIntensites) then
+			   {Merge MusiquesAvecIntensites}|{Final T}
+			end
+	    end
 	 end
       end
 	    
-      fun {ToAudio ListeEchantillons}
-	 local ToAudioAux NbAiS  NbAiTot in
-	    
+      fun {ToAudio ListeEchantillons1}
+	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
-	       
 	       if {IntToFloat I} == 0.0 then nil
 	       else
 		  case Hauteur
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
 		  [] H then local F Ai in
-			       F = {Number.pow 2.0 ({IntToFloat H}/12.0)} * 440.0
-			       Ai = (0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)})
+			       F = {Number.pow 2.0 {IntToFloat H}/12.0} * 440.0
+			      % Ai = (0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)})
+			       Ai = 0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)}
 			       Ai|{ToAudioAux H N I-1}
 			    end
 		  end
 	       end
 	    end
-		  
+	    
 	    NbAiS = 44100.0
-
+	    ListeEchantillons = {Flatten ListeEchantillons1}
 	    case ListeEchantillons
 	    of nil then nil
 	    [] H|T then case H
@@ -340,7 +342,7 @@ local Mix Interprete Projet CWD in
 	       
 	    elseif Debut < 0.0 then if Fin < 0.0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
 	       
-	    elseif Debut < 0.0 then if Fin > 0.0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0.0 Fin*44100.0 Audio} end
+	    elseif Debut < 0.0 then if Fin > 0.0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{CoupeAux 0.0 Fin*44100.0 Audio} end
 	       
 	    else {CoupeAux Debut*44100.0 Fin*44100.0 Audio}
 	    end
@@ -365,31 +367,34 @@ local Mix Interprete Projet CWD in
 	 {Bourdon 'silence' Partition}
       end
 	    
-      fun {Lire Partition}
-	 case Partition
-	 of nil then nil
-	 [] H|T then case H  
-		     of muet(Part) then {Muet {Interprete Part}}|{Lire T}
-		     [] duree(secondes:S Part) then {Duree S {Interprete Part}}|{Lire T}
-		     [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}|{Lire T}
-		     [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}|{Lire T}
-		     [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}|{Lire T}
-		     else {ToNote H}|{Lire T}
-		     end
-	 [] H then case H
-		   of muet(Part) then {Muet {Interprete Part}}
-		   [] duree(secondes:S Part) then {Duree S {Interprete Part}}
-		   [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
-		   [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
-		   [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
-		   else {ToNote H}
-		   end
+      fun {Lire Partition1}
+	 local Partition in
+	    Partition = {Flatten Partition1}
+	    case Partition
+	    of nil then nil
+	    [] H|T then case H  
+			of muet(Part) then {Muet {Interprete Part}}|{Lire T}
+			[] duree(secondes:S Part) then {Duree S {Interprete Part}}|{Lire T}
+			[] etirer(facteur:F Part) then {Etirer F {Interprete Part}}|{Lire T}
+			[] bourdon(note:N Part) then {Bourdon N {Interprete Part}}|{Lire T}
+			[] transpose(demitons:E Part) then {Transpose E {Interprete Part}}|{Lire T}
+			else {ToNote H}|{Lire T}
+			end
+	    [] H then case H
+		      of muet(Part) then {Muet {Interprete Part}}
+		      [] duree(secondes:S Part) then {Duree S {Interprete Part}}
+		      [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
+		      [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
+		      [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
+		      else {ToNote H}
+		      end
+	    end
 	 end
       end
       
       fun {Interprete Partition}
 	 local P in
-	    P={Flatten Partition}
+	    P = {Flatten Partition}
 	    {Lire P}
 	 end
       end
