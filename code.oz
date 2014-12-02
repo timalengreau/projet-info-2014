@@ -407,7 +407,6 @@ local Mix Interprete Projet CWD in
 	    {Flatten {Final M}}	    
 	 end
       end
-      
    end
    
    local 
