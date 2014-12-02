@@ -87,7 +87,7 @@ local Mix Interprete Projet CWD in
 	 [] H|T then case H of voix(Voix) then Voix|{Final T}
 		     [] partition(Partition) then {ToAudio {Interprete Partition}}|{Final T}
 		     [] wave(Fichier) then {Projet.readFile CWD#'Fichier'}|{Final T}
-		     [] renverser(Musique) then {ToAudio {Renverser {Mix Interprete Musique}}}|{Final T}
+		     [] renverser(Musique) then {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
 		     [] repetition(nombre:N Musique) then {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
 		     [] repetition(duree:S Musique) then {ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
 		     [] clip(bas:Bas haut:Haut Musique) then {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
@@ -96,7 +96,7 @@ local Mix Interprete Projet CWD in
 		     [] echo(delai:S decadence:D repetition:R Musique) then {Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
 		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
 		     [] fondu_enchaine(duree:S Musique1 Musique2) then {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
-		     [] couper(debut:Debut fin:Fin Musique) then {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}
+		     [] couper(debut:Debut fin:Fin Musique) then {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
 		     [] merge(MusiquesAvecIntensites) then {Merge MusiquesAvecIntensites}|{Final T}
 		     end
 	 end
@@ -233,7 +233,7 @@ local Mix Interprete Projet CWD in
 
 	    fun {EchoAux Del Dec Rep M Acc}
 	       if Acc==Rep then nil
-	       else I^(Acc+1)#[voix[silence(duree:Del*Acc)] M]|{EchoAux Del Dec Rep Acc+1}
+	       else I^(Acc+1)#[voix[silence(duree:Del*Acc)] M]|{EchoAux Del Dec Rep M Acc+1}
 	       end
 	    end
 
@@ -291,8 +291,8 @@ local Mix Interprete Projet CWD in
 	    end
 		     
 	    Inter = Fin - Debut
-	    if Inter < 0 then {Coupe Fin Debut Audio} end
-	    if Debut < 0 then if Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
+	    if Inter < 0.0 then {Coupe Fin Debut Audio}
+	    elseif Debut < 0 then if Fin < 0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
 	    elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 Audio} end
 	    else {CoupeAux Debut*44100 Fin*44100 Audio}
 	    end
@@ -321,13 +321,12 @@ local Mix Interprete Projet CWD in
 	 case Partition
 	 of nil then nil
 	 [] H|T then case H  
-		     of muet(Part) then {Muet {Interprete Part}}
-		     [] duree(secondes:S Part) then {Duree S {Interprete Part}}
-		     [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
-		     [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
-		     [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
+		     of muet(Part) then {Muet {Interprete Part}}|{Lire T}
+		     [] duree(secondes:S Part) then {Duree S {Interprete Part}}|{Lire T}
+		     [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}|{Lire T}
+		     [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}|{Lire T}
+		     [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}|{Lire T}
 		     end
-	    H|{Lire T}
 	 end
       end
       
