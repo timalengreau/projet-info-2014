@@ -142,7 +142,7 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 		     
 	    fun {IntensiteTotale L Acc}
 	       case L of nil then Acc
-	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisé qu'une seule fois : c'est normal :)
+	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisee qu'une seule fois : c'est normal :)
 			   end
 	       end
 	    end
