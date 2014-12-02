@@ -42,7 +42,7 @@ local Mix Interprete Projet CWD in
 	       C = Note.octave
 	       H2 = H1 + (((C-4)*12))
 	       if Note.alteration == '#' then Hauteur = H2 + 1
-		  else Hauteur = H2
+	       else Hauteur = H2
 	       end
 	       echantillon(hauteur:Hauteur duree:1.0 instrument:none)	  
 	    end
@@ -252,7 +252,7 @@ local Mix Interprete Projet CWD in
       fun {Fondu Ouverture Fermeture Audio}
 	 local FonduAux in
 	    if Ouverture > 0.0 then if {Longueur Audio 0} > (44100.0*Ouverture) then {FonduAux Audio Ouverture*44100.0 1.0}
-				  end
+				    end
 	    end
 	    fun {FonduAux Audio Duree Acc}
 	       if Acc == Duree then nil
@@ -261,7 +261,7 @@ local Mix Interprete Projet CWD in
 	       end
 	    end
 	    if Fermeture > 0.0 then if {Longueur Audio 0} > (44100.0*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
-				  end
+				    end
 	    end
 	 end
       end
