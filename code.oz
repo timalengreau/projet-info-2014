@@ -27,21 +27,22 @@ local Mix Interprete Projet CWD in
       end
       
       fun {ToEchantillon Note}
-	 local Nom C Hauteur in
+	 local Nom C Hauteur H1 H2 in
 	    Nom = Note.nom
 	    if Note == 'silence' then silence(duree:1.0)
 	    else
-	       if Nom == 'a' then Hauteur = 0
-	       elseif Nom == 'b' then Hauteur = 2
-	       elseif Nom == 'c' then Hauteur = 3
-	       elseif Nom == 'd' then Hauteur = 5
-	       elseif Nom == 'e' then Hauteur = 7
-	       elseif Nom == 'f' then Hauteur = 8
-	       elseif Nom == 'g' then Hauteur = 10
+	       if Nom == 'a' then H1 = 0
+	       elseif Nom == 'b' then H1 = 2
+	       elseif Nom == 'c' then H1 = 3
+	       elseif Nom == 'd' then H1 = 5
+	       elseif Nom == 'e' then H1 = 7
+	       elseif Nom == 'f' then H1 = 8
+	       elseif Nom == 'g' then H1 = 10
 	       end
 	       C = Note.octave
-	       Hauteur = Hauteur + (((C-4)*12))
-	       if Note.alteration == '#' then Hauteur = Hauteur + 1
+	       H2 = H1 + (((C-4)*12))
+	       if Note.alteration == '#' then Hauteur = H2 + 1
+		  else Hauteur = H2
 	       end
 	       echantillon(hauteur:Hauteur duree:1.0 instrument:none)	  
 	    end
@@ -50,7 +51,7 @@ local Mix Interprete Projet CWD in
       
       fun {Duree DureeTotaleVoulue Partition}
 	 local DureeActuelle in
-	    DureeActuelle = {TempsTotal Partition 0}
+	    DureeActuelle = {TempsTotal Partition 0.0}
 	    {Etirer Partition DureeTotaleVoulue/DureeActuelle}
 	 end
       end

@@ -29,7 +29,7 @@ fun {ToEchantillon Note} %Faire les silences /!\
 end
 
 
-{Browse {FloatToInt 2.5}}
+{Browse {Transpose 12 note(nom:a octave:4 alteration:none)}}
 
 /*    case L of nil then nil end
 		  if N==1 then case L.1 of I#M then {Intensifier (I/Itot) M}
@@ -75,7 +75,7 @@ end
 				   end
 		  end   */
 
-%		  fun {Coupe Debut Fin M}
+		  fun {Coupe Debut Fin M}
 	       /*local Inter Silence Duree CoupeAux D F in
 		    fun {CoupeAux D F M}
 		       if Fin == 0 then nil
@@ -90,6 +90,6 @@ end
 		    elseif Debut < 0 then if Fin > 0 then ({ToAudio {Etirer ~Debut {ToNote Silence}}})|{CoupeAux 0 Fin*44100 M} end
 		    else {CoupeAux Debut*44100 Fin*44100 M}
 		    end
-		 end*/
-%	       0
-%	    end
+		 end/* */
+	       0
+	    end
