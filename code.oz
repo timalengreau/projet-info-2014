@@ -2,8 +2,8 @@ local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre systeme.
 
-   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    % Projet fournit quatre fonctions :
    % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
@@ -252,16 +252,20 @@ CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Inf
 
       fun {Fondu Ouverture Fermeture Audio}
 	 local FonduAux in
-	    if Ouverture > 0.0 then if {Longueur Audio 0} > (44100.0*Ouverture) then {FonduAux Audio Ouverture*44100.0 1.0}
-				    end
-	    end
+
 	    fun {FonduAux Audio Duree Acc}
 	       if Acc == Duree then nil
 	       else
 		  ((Audio.1*Acc)/Duree)|{FonduAux Audio.2 Duree Acc+1.0}
 	       end
 	    end
-	    if Fermeture > 0.0 then if {Longueur Audio 0} > (44100.0*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
+	    
+	    if Ouverture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Ouverture) then {FonduAux Audio Ouverture*44100.0 1.0}
+				    end
+	    end
+	    
+	    
+	    if Fermeture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Fermeture) then {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
 				    end
 	    end
 	 end
