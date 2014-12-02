@@ -37,11 +37,11 @@ local Mix Interprete Projet CWD in
 	    else
 	       if Nom == 'a' then H1 = 0
 	       elseif Nom == 'b' then H1 = 2
-	       elseif Nom == 'c' then H1 = 3
-	       elseif Nom == 'd' then H1 = 5
-	       elseif Nom == 'e' then H1 = 7
-	       elseif Nom == 'f' then H1 = 8
-	       elseif Nom == 'g' then H1 = 10
+	       elseif Nom == 'c' then H1 = ~9
+	       elseif Nom == 'd' then H1 = ~7
+	       elseif Nom == 'e' then H1 = ~5
+	       elseif Nom == 'f' then H1 = ~4
+	       elseif Nom == 'g' then H1 = ~2
 	       end
 	       C = Note.octave
 	       H2 = H1 + (((C-4)*12))
@@ -146,7 +146,7 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
       end
-	    
+      
       fun {ToAudio ListeEchantillons1}
 	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
@@ -155,7 +155,7 @@ local Mix Interprete Projet CWD in
 		  case Hauteur
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
 		  [] H then local F Ai in
-			       F = {Number.pow 2.0 {IntToFloat H}/12.0} * 440.0
+			       F = {Number.pow 2.0 ({IntToFloat H}/12.0)} * 440.0
 			       %Ai = 0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)}
 			       Ai = 0.5*{Sin (2.0*3.14159265359*F*({IntToFloat N}))/44100.0}
 			       Ai|{ToAudioAux H N+1 I-1}
