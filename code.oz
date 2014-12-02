@@ -156,9 +156,9 @@ local Mix Interprete Projet CWD in
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
 		  [] H then local F Ai in
 			       F = {Number.pow 2.0 {IntToFloat H}/12.0} * 440.0
-			      % Ai = (0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)})
-			       Ai = 0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)}
-			       Ai|{ToAudioAux H N I-1}
+			       %Ai = 0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)}
+			       Ai = 0.5*{Sin (2.0*3.14159265359*F*({IntToFloat N}))/44100.0}
+			       Ai|{ToAudioAux H N+1 I-1}
 			    end
 		  end
 	       end
@@ -171,10 +171,12 @@ local Mix Interprete Projet CWD in
 	    [] H|T then case H
 			of silence(duree:S) then
 			   NbAiTot = {FloatToInt NbAiS*S}
-			   {ToAudioAux 'silence' NbAiTot NbAiTot}|{ToAudio T}
+			   %{ToAudioAux 'silence' NbAiTot NbAiTot}|{ToAudio T}
+			   {ToAudioAux 'silence' 1 NbAiTot}|{ToAudio T}
 			[] echantillon(hauteur:H duree:S instrument:none) then
 			   NbAiTot = {FloatToInt NbAiS*S}
-			   {ToAudioAux H NbAiTot NbAiTot}|{ToAudio T}
+			   %{ToAudioAux H NbAiTot NbAiTot}|{ToAudio T}
+			   {ToAudioAux H 1 NbAiTot}|{ToAudio T}
 			end
 	    end
 	 end     
@@ -395,14 +397,14 @@ local Mix Interprete Projet CWD in
       fun {Interprete Partition}
 	 local P in
 	    P = {Flatten Partition}
-	    {Lire P}
+	    {Flatten {Lire P}}
 	 end
       end
 
       fun {Mix Interprete Music}
 	 local M in
 	    M = {Flatten Music}
-	    {Final M}	    
+	    {Flatten {Final M}}	    
 	 end
       end
       
