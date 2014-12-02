@@ -1,7 +1,9 @@
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre Ã  votre systeme.
-   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+
+   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    % Projet fournit quatre fonctions :
    % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
@@ -86,7 +88,7 @@ local Mix Interprete Projet CWD in
 	 of nil then nil
 	 [] H|T then case H of voix(Voix) then Voix|{Final T}
 		     [] partition(Partition) then {ToAudio {Interprete Partition}}|{Final T}
-		     [] wave(Fichier) then {Projet.readFile CWD#'Fichier'}|{Final T}
+		     [] wave(Fichier) then {Projet.readFile CWD#Fichier}|{Final T}
 		     [] renverser(Musique) then {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
 		     [] repetition(nombre:N Musique) then {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
 		     [] repetition(duree:S Musique) then {ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
@@ -136,11 +138,11 @@ local Mix Interprete Projet CWD in
       end	    
 	    
       fun {Merge L}
-	 local N Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
+	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
 		     
 	    fun {IntensiteTotale L Acc}
 	       case L of nil then Acc
-	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I}
+	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisé qu'une seule fois : c'est normal :)
 			   end
 	       end
 	    end
@@ -182,7 +184,6 @@ local Mix Interprete Projet CWD in
 	       end 
 	    end
 
-	    N = {Longueur L 0}
 	    Itot = {IntensiteTotale L 0}
 	    {Somme {IntensifierList L}}
 		  
@@ -267,9 +268,7 @@ local Mix Interprete Projet CWD in
       end
 
       fun {FonduEnchaine Duree Audio1 Audio2}
-	 local Voix Silence in
-	    {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [Voix([Silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
-	 end
+	    {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
 
       fun {Longueur List Acc}
@@ -279,10 +278,10 @@ local Mix Interprete Projet CWD in
       end
 	    
       fun {Coupe Debut Fin Audio}
-	 local Inter Silence Duree CoupeAux D F in
+	 local Inter Silence CoupeAux in
 	    fun {CoupeAux D F Audio}
-	       if Fin == 0.0 then nil
-	       elseif Debut == 0.0 then Audio.1|{Coupe 0.0 F-1 Audio.2}
+	       if F == 0.0 then nil
+	       elseif D == 0.0 then Audio.1|{Coupe 0.0 F-1 Audio.2}
 	       else {Coupe D-1 F-1 Audio.2}   
 	       end
 	    end
