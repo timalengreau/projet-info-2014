@@ -3,8 +3,8 @@ local Mix Interprete Projet CWD in
    % modifiez sa valeur pour correspondre à votre systeme.
 
 
-   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
 
    % Projet fournit quatre fonctions :
@@ -22,11 +22,15 @@ local Mix Interprete Projet CWD in
    %in
    local Lire Final  ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe Transpose Bourdon Muet ToEchantillon TempsTotal ToNote Duree Etirer in
       
-      fun {TempsTotal Partition TempsTotal}
-	 case Partition.1 of note(hauteur:h duree:d instrument:none)
-	 then {TempsTotal Partition.2 TempsTotal+Partition.1.note}
-	 [] nil then TempsTotal
-	 else {TempsTotal Partition.2 TempsTotal}
+      fun {TempsTotal Partition TempsTot}
+	 {Browse 'TempsTotal'}
+	 case Partition
+	 of nil then TempsTot 
+	 [] H|T then case H
+		     of  note(hauteur:H duree:D instrument:none)
+		     then {TempsTotal T TempsTot+D}
+		     else {TempsTotal T TempsTot}
+		     end
 	 end
       end
       
@@ -54,16 +58,19 @@ local Mix Interprete Projet CWD in
       end
       
       fun {Duree DureeTotaleVoulue Partition}
-	 local DureeActuelle in
+	 {Browse 'Duree'}
+	 local DureeActuelle K in
 	    DureeActuelle = {TempsTotal Partition 0.0}
-	    {Etirer Partition DureeTotaleVoulue/DureeActuelle}
+	    {Etirer DureeTotaleVoulue/DureeActuelle Partition}
+	    
 	 end
       end
 	 
       fun {Etirer Facteur Partition}
+	 {Browse 'Etirer'}
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
-	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)
+	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|nil
 	 end
       end
       
@@ -103,7 +110,7 @@ local Mix Interprete Projet CWD in
 	    [] H|T then case H
 			of voix(Voix) then Voix|{Final T}
 			
-			[] partition(Partition) then
+			[] partition(Partition) then {Browse 'casetoaudio'}
 			   {ToAudio {Interprete Partition}}|{Final T}
 			
 			[] wave(Fichier) then
@@ -120,7 +127,6 @@ local Mix Interprete Projet CWD in
 			
 			[] clip(bas:Bas haut:Haut Musique) then
 			   {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
-			
 			
 			[] echo(delai:S Musique) then
 			   {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
@@ -143,11 +149,55 @@ local Mix Interprete Projet CWD in
 			[] merge(MusiquesAvecIntensites) then
 			   {Merge MusiquesAvecIntensites}|{Final T}
 			end
+	       [] K then case K
+			of voix(Voix) then Voix
+			
+			[] partition(Partition) then {Browse 'CASEpartition(Partition)'}
+			   {ToAudio {Interprete Partition}}
+			
+			[] wave(Fichier) then
+			   {Projet.readFile CWD#Fichier}
+			
+			[] renverser(Musique) then
+			   {ToAudio {Renverser {Mix Interprete Musique} nil}}
+			
+			[] repetition(nombre:N Musique) then
+			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}
+			
+			[] repetition(duree:S Musique) then
+			   {ToAudio {RepetitionD S {Mix Interprete Musique}}}
+			
+			[] clip(bas:Bas haut:Haut Musique) then
+			   {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}
+			
+			[] echo(delai:S Musique) then
+			   {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}
+			
+			[] echo(delai:S decadence:D Musique) then
+			   {Echo S D 1 {ToAudio {Mix Interprete Musique}}}
+			
+			[] echo(delai:S decadence:D repetition:R Musique) then
+			   {Echo S D R {ToAudio {Mix Interprete Musique}}}
+			
+			[] fondu(ouverture:Ouv fermeture:Ferm Musique) then
+			   {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}
+			
+			[] fondu_enchaine(duree:S Musique1 Musique2) then
+			   {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}
+			
+			[] couper(debut:Debut fin:Fin Musique) then
+			   {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}
+			
+			[] merge(MusiquesAvecIntensites) then
+			   {Merge MusiquesAvecIntensites}
+			end
+	   	   % else {Mix Interprete M}
 	    end
 	 end
       end
       
       fun {ToAudio ListeEchantillons1}
+	 {Browse 'ToAudio'}
 	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
 	       if {IntToFloat I} == 0.0 then nil
@@ -177,11 +227,16 @@ local Mix Interprete Projet CWD in
 			   NbAiTot = {FloatToInt NbAiS*S}
 			   %{ToAudioAux H NbAiTot NbAiTot}|{ToAudio T}
 			   {ToAudioAux H 1 NbAiTot}|{ToAudio T}
+	%		else {Mix Interprete ListeEchantillons}
+			else if H > ~1.0 then if H < 1.0 then H|{ToAudio T}
+					    end
+			   end
 			end
+	%    else {Mix Interprete ListeEchantillons}
 	    end
 	 end     
-      end	    
-	    
+      end
+      
       fun {Merge L}
 	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
 		     
@@ -229,7 +284,7 @@ local Mix Interprete Projet CWD in
 	       end 
 	    end
 
-	    Itot = {IntensiteTotale L 0}
+	    Itot = {IntensiteTotale L 0.0}
 	    {Somme {IntensifierList L}}
 		  
 	 end
@@ -352,6 +407,7 @@ local Mix Interprete Projet CWD in
       end   
 
       fun {Transpose NbreDemiTons Partition}
+{Browse 'Transpose'}
 	 case Partition
 	 of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
@@ -359,6 +415,7 @@ local Mix Interprete Projet CWD in
       end
 
       fun {Bourdon Note Partition}
+	 {Browse 'Bourdon'}
 	 if Partition == nil then nil
 	 else
 	    ({ToNote Note})|{Bourdon Note Partition.2}
@@ -374,20 +431,31 @@ local Mix Interprete Projet CWD in
 	    Partition = {Flatten Partition1}
 	    case Partition
 	    of nil then nil
-	    [] H|T then case H  
+	    [] H|T then case H
 			of muet(Part) then {Muet {Interprete Part}}|{Lire T}
+			   
 			[] duree(secondes:S Part) then {Duree S {Interprete Part}}|{Lire T}
+			   
 			[] etirer(facteur:F Part) then {Etirer F {Interprete Part}}|{Lire T}
+			   
 			[] bourdon(note:N Part) then {Bourdon N {Interprete Part}}|{Lire T}
+			   
 			[] transpose(demitons:E Part) then {Transpose E {Interprete Part}}|{Lire T}
-			else {ToNote H}|{Lire T}
+			   
+			else {ToNote H}|{Lire T}  
 			end
+	       
 	    [] H then case H
 		      of muet(Part) then {Muet {Interprete Part}}
+			 
 		      [] duree(secondes:S Part) then {Duree S {Interprete Part}}
+			 
 		      [] etirer(facteur:F Part) then {Etirer F {Interprete Part}}
+			 
 		      [] bourdon(note:N Part) then {Bourdon N {Interprete Part}}
+			 
 		      [] transpose(demitons:E Part) then {Transpose E {Interprete Part}}
+			 
 		      else {ToNote H}
 		      end
 	    end
@@ -410,7 +478,7 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'joie.dj.oz'}
+      Music = {Projet.load CWD#'Lettre-A-Elise.oz'}
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui demontre les fonctionalites de votre
