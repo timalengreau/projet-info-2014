@@ -4,8 +4,8 @@
 
 local Mix Interprete Projet CWD in
 
-   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
@@ -119,37 +119,40 @@ local Mix Interprete Projet CWD in
 			{Projet.readFile CWD#Fichier}|{Final T}
 			
 		     [] renverser(Musique) then
-			{ToAudio {Renverser {Mix Interprete Musique}}}|{Final T}
+			{Renverser {Mix Interprete Musique}}|{Final T}
 			
 		     [] repetition(nombre:N Musique) then
-			{ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
+			{RepetitionN N {Mix Interprete Musique}}|{Final T}
 			
 		     [] repetition(duree:S Musique) then
-			{ToAudio {RepetitionD S {Mix Interprete Musique}}}|{Final T}
+			{RepetitionD S {Mix Interprete Musique}}|{Final T}
 			
 		     [] clip(bas:Bas haut:Haut Musique) then
-			{Clip Bas Haut {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Clip Bas Haut {Mix Interprete Musique}}|{Final T}
 			
 		     [] echo(delai:S Musique) then
 			{Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
 			
 		     [] echo(delai:S decadence:D Musique) then
-			{Echo S D 1 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Echo S D 1 {Mix Interprete Musique}}|{Final T}
 			
 		     [] echo(delai:S decadence:D repetition:R Musique) then
-			{Echo S D R {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Echo S D R {Mix Interprete Musique}}|{Final T}
 			
 		     [] fondu(ouverture:Ouv fermeture:Ferm Musique) then
-			{Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Fondu Ouv Ferm {Mix Interprete Musique}}|{Final T}
 			
 		     [] fondu_enchaine(duree:S Musique1 Musique2) then
-			{FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}|{Final T}
+			{FonduEnchaine S {Mix Interprete Musique1} {Mix Interprete Musique2}}|{Final T}
 			
 		     [] couper(debut:Debut fin:Fin Musique) then
-			{Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Coupe Debut Fin {Mix Interprete Musique}}|{Final T}
 			
 		     [] merge(MusiquesAvecIntensites) then
 			{Merge MusiquesAvecIntensites}|{Final T}
+		     [] H then if H < ~1.0 then if H > 1.0 then H|{Final T}
+						end
+			       end
 		     end
 	 [] K then case K
 		   of voix(Voix) then Voix
@@ -161,37 +164,41 @@ local Mix Interprete Projet CWD in
 		      {Projet.readFile CWD#Fichier}
 			 
 		   [] renverser(Musique) then
-		      {ToAudio {Renverser {Mix Interprete Musique}}}
+		      {Renverser {Mix Interprete Musique}}
 			
 		   [] repetition(nombre:N Musique) then
-		      {ToAudio {RepetitionN N {Mix Interprete Musique}}}
+		      {RepetitionN N {Mix Interprete Musique}}
 			 
 		   [] repetition(duree:S Musique) then
-		      {ToAudio {RepetitionD S {Mix Interprete Musique}}}
+		      {RepetitionD S {Mix Interprete Musique}}
 			 
 		   [] clip(bas:Bas haut:Haut Musique) then
-		      {Clip Bas Haut {ToAudio {Mix Interprete Musique}}}
+		      {Clip Bas Haut {Mix Interprete Musique}}
 			 
 		   [] echo(delai:S Musique) then
-		      {Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}
+		      {Echo S 1.0 1.0 {Mix Interprete Musique}}
 			
 		   [] echo(delai:S decadence:D Musique) then
-		      {Echo S D 1 {ToAudio {Mix Interprete Musique}}}
+		      {Echo S D 1 {Mix Interprete Musique}}
 			
 		   [] echo(delai:S decadence:D repetition:R Musique) then
-		      {Echo S D R {ToAudio {Mix Interprete Musique}}}
+		      {Echo S D R {Mix Interprete Musique}}
 			
 		   [] fondu(ouverture:Ouv fermeture:Ferm Musique) then
-		      {Fondu Ouv Ferm {ToAudio {Mix Interprete Musique}}}
+		      {Fondu Ouv Ferm {Mix Interprete Musique}}
 			
 		   [] fondu_enchaine(duree:S Musique1 Musique2) then
-		      {FonduEnchaine S {ToAudio {Mix Interprete Musique1}} {ToAudio {Mix Interprete Musique2}}}
+		      {FonduEnchaine S {Mix Interprete Musique1} {Mix Interprete Musique2}}
 			
 		   [] couper(debut:Debut fin:Fin Musique) then
-		      {Coupe Debut Fin {ToAudio {Mix Interprete Musique}}}
+		      {Coupe Debut Fin {Mix Interprete Musique}}
 			
 		   [] merge(MusiquesAvecIntensites) then
 		      {Merge MusiquesAvecIntensites}
+		      
+		   [] K then if K < ~1.0 then if K > 1.0 then K
+						end
+			     end
 		   end
 	 end
       end
@@ -253,11 +260,14 @@ local Mix Interprete Projet CWD in
       %Sortie : une liste de vecteurs audios traduisant les musiques jouees simultanement, chacune avec une intensite determinee (la somme des intensites ne depasse jamais 1)
 % ?
       fun {Merge L}
+	 {Browse 'Merge'}
 	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
 
 	    %Entree : L, une liste de musiques intensifiees
 	    %Sortie : la somme des intensites
+%Ok
 	    fun {IntensiteTotale L Acc}
+	       {Browse 'Itot'}
 	       case L of nil then Acc
 	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisee qu'une seule fois : c'est normal, on additionne les intensites
 			   end
@@ -266,28 +276,30 @@ local Mix Interprete Projet CWD in
 
 	    %Entree : I l'intensite a donner a la musique M
 	    %Sortie : un vecteur audio de la musique intensifiee
+% OK
 	    fun {IntensifierMusic I M}
-	       local Maudio /*Minter*/ in
-		  Maudio = {Mix Interprete M}
-		  %Maudio = {ToAudio Minter}
-		  case Maudio of nil then nil
+	       {Browse 'IM'}
+		  case M of nil then nil
 		  [] H|T then (I*H)|{IntensifierMusic I T}
 		  end
-	       end
 	    end
 
 	    %Entree : L, une liste de musique à intensifier
 	    %Sortie : une liste de musiques intensifiees
+% OK
 	    fun {IntensifierList L}
+	       {Browse 'IL'}
 	       case L of nil then nil
-	       [] H|T then case H of I#M then {IntensifierMusic (I/Itot) M}|{IntensifierList T}
+	       [] H|T then case H of I#M then {IntensifierMusic (I/Itot) {Mix Interprete M}}|{IntensifierList T}
 			   end
 	       end
 	    end
 
 	    %Entree : L1, L2 deux listes a additionner element par element
 	    %Sortie : une liste contenant l'addition des elements un a un des deux listes d'entree
+% OK
 	    fun {AdditionList L1 L2}
+	       {Browse 'Add'}
 	       case L1
 	       of nil then case L2
 			   of nil then nil
@@ -302,19 +314,22 @@ local Mix Interprete Projet CWD in
 	    
 	    %Entree : L, une liste de listes dont on veut la somme
 	    %Sortie : une liste dont toutes les listes ete additionnees suivant AdditionList
+% OK
 	    fun {Somme L}
+	       {Browse 'Somme'}
 	       case L of H|nil then H|nil
 	       [] H1|H2|T then {Somme ({AdditionList H1 H2}|T)}
 	       end 
 	    end
 	    
 	    Itot = {IntensiteTotale L 0.0}
-	    {Somme {IntensifierList L}}
+	    {Browse {Flatten {Somme {IntensifierList L}}}}
+	    {Flatten {Somme {IntensifierList L}}}
 	    
 	 end
       end
       
-      %Entree : L, la liste à inverser, Acc un accumulateur qui vaut nil au départ
+      %Entree : L, la liste à inverser
       %Sortie : la liste L inversée    
 % OK
       fun {Renverser L}
@@ -346,20 +361,12 @@ local Mix Interprete Projet CWD in
       %Sortie : la musique repetee durant Duree
 % ?
       fun {RepetitionD Duree M}
-	 local NbRep M1 M2 in
-	    NbRep = {FloatToInt {TempsTotal M 0.0}/ Duree}
-	    M1 = {RepetitionN NbRep M}
-	    M2 = {Coupe 0.0 {IntToFloat {FloatToInt {TempsTotal M 0.0}}mod{FloatToInt Duree}} M}
-	    /*fun {M2 Duree M Acc}
-		 case M of nil then nil
-		 [] H|T then case H of echantillon(hauteur:H duree:D instrument:T) then if Acc+D > Duree then nil
-											else H|{M2 Duree T Acc+D}
-											end
-			     end
-		  
-		 end
-	      end*/
-	    M1 + M2
+	 local NbRep M1 M2 Ttot in
+	    Ttot = {TempsTotal M 0.0}
+	    NbRep = {FloatToInt Duree/Ttot}
+	    M1 = {RepetitionN NbRep-1 M}
+	    M2 = {Coupe 0.0 Duree-(Ttot*{IntToFloat NbRep}) M}
+	    {Append M1 M2}
 	 end
       end
 
@@ -451,7 +458,7 @@ local Mix Interprete Projet CWD in
 
       %Entree : un fichier audio qu'on veut couper entre debut et fin
       %Sortie : le fichier coupé
-% CoupeAux OK
+% OK
       fun {Coupe Debut Fin Audio}
 	 local Inter CoupeAux in
 

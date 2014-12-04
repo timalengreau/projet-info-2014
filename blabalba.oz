@@ -1,18 +1,10 @@
 local
-   A = [c d e f g]
-   
-   B
-   fun {RepetitionN NbRep M}
-	 if NbRep==1 then M
-	 else {Append M {RepetitionN NbRep-1  M}}
-	 end	    
-      end
+   A = [c4 d4 e4]
+   B = [e4 f4 g4]
+   C = [etirer(facteur:3 c4)]
+    
 in
-   
- B =[couper(debut:1.0 fin:5.0 partition(A))]
 
+   [merge([0.5#partition(A) 0.3#partition(B) 0.2#partition(C)])]
 
-
-   {Browse {RepetitionN 3 A}}
-
-   end
+end
