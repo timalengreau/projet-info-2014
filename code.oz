@@ -359,11 +359,10 @@ local Mix Interprete Projet CWD in
 	    end
 
 	    I = 1.0/{EquIntensite Decadence Repetition}
-	    {Browse I}
 	   
 	    fun {EchoAux Del Dec Rep M Acc} 
 	       if Acc==Rep then nil
-	       else {Browse {IntToFloat Acc}}
+	       else
 		  {Pow I {IntToFloat (Acc+1)}}#[voix([silence(duree:Del*{IntToFloat Acc})]) M]|{EchoAux Del Dec Rep M Acc+1}
 	       end
 	    end
@@ -466,6 +465,7 @@ local Mix Interprete Projet CWD in
 	 case Partition
 	 of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
+	 [] H then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)
 	 end
       end
 
@@ -539,7 +539,7 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'blabalba.oz'}
+      Music = {Projet.load CWD#'Lettre-A-Elise.dj.oz'}
    in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
