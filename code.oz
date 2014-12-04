@@ -98,8 +98,7 @@ local Mix Interprete Projet CWD in
 
       %Entree : une musique
       %Sortie : un vecteur audio
-      %La musique en entree est decortiquee et chaque element est traite en fonction de sa nature (partition, wave, filtres, etc.)
-% A PRIORI QUOIQUE      
+      %La musique en entree est decortiquee et chaque element est traite en fonction de sa nature (partition, wave, filtres, etc.)      
       fun {Final M}
 	 case M
 	 of nil then nil
@@ -422,7 +421,6 @@ local Mix Interprete Projet CWD in
 
       %Entree : deux fichiers audio qu'on enchaine avec un fondu
       %Sortie : le vecteur audio transforme
-% ? 
       fun {FonduEnchaine Duree Audio1 Audio2}
 	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
@@ -541,7 +539,7 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'Lettre-A-Elise.dj.oz'}
+      Music = {Projet.load CWD#'the-ice-dance.dj.oz'}
    in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
