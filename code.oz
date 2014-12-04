@@ -1,39 +1,32 @@
+%code mixe une musique et renvoit un fichier wave
+%Auteurs : Timothee Malengreau NOMA : 6618-13-00
+%          Charlotte Poncette NOMA : 9458-12-00
+
 local Mix Interprete Projet CWD in
-   % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
-   % modifiez sa valeur pour correspondre Ã  votre systeme.
 
+   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
-   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
-
-
-   % Projet fournit quatre fonctions :
-   % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
-   % {Projet.readFile FileName} = audioVector(AudioVector) OR error(...)
-   % {Projet.writeFile FileName AudioVector} = ok OR error(...)
-   % {Projet.load 'music_file.oz'} = Oz structure.
-   %
-   % et une constante :
-   % Projet.hz = 44100, la frequence d'echantilonnage (nombre de donnees par seconde)
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
-   %local
-   %   Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
-   %in
    local Lire Final  ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe Transpose Bourdon Muet ToEchantillon TempsTotal ToNote Duree Etirer in
-      
+
+      %Entrée : une partition (Partition) et un accumulateur (TempsTot) qu'on doit initialiser à 0.0
+      %Sortie : la durée totale de la partition en secondes.
       fun {TempsTotal Partition TempsTot}
-	 {Browse 'TempsTotal'}
 	 case Partition
 	 of nil then TempsTot 
 	 [] H|T then case H
-		     of  note(hauteur:H duree:D instrument:none)
+		     of  echantillon(hauteur:H duree:D instrument:none)
 		     then {TempsTotal T TempsTot+D}
 		     else {TempsTotal T TempsTot}
 		     end
 	 end
       end
       
+      %Entree : une note étendue (Note) de la forme note(nom:<nom> octave:<octave> alteration:<alteration>)
+      %Sortie : un echantillon de la forme  echantillon(hauteur:<hauteur> duree:<duree> instrument:none)
+      %la durée étant en secondes et la hauteur étant la différence de demitons entre la note en entrée et a4, le la de référence d'une fréquence de 440Hz.
       fun {ToEchantillon Note}
 	 local Nom C Hauteur H1 H2 in
 	    Nom = Note.nom
@@ -57,23 +50,26 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
+      %Entree : une partition et la durée voulue pour cette partition
+      %Sortie : une partition qui dure la duree totale voulue d'entrée
       fun {Duree DureeTotaleVoulue Partition}
-	 {Browse 'Duree'}
-	 local DureeActuelle K in
+	 local DureeActuelle in
 	    DureeActuelle = {TempsTotal Partition 0.0}
 	    {Etirer DureeTotaleVoulue/DureeActuelle Partition}
-	    
 	 end
       end
-	 
+
+      %Entree : une partition et le facteur avec lequel nous voulons étirer cette partition
+      %Sortie : une partition dont la duree a ete multipliee par le facteur d'entree
       fun {Etirer Facteur Partition}
-	 {Browse 'Etirer'}
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
-	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|nil
+	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)%|nil
 	 end
       end
-      
+
+      %Entree : une partition
+      %Sortie : une liste d'echantillons
       fun {ToNote Partition}
 	 local M in
 	    case Partition
@@ -100,24 +96,23 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      %Mix prends une musique et doit retourner un vecteur audio.
-
-      fun {Final Mrecu}
-	 local M in
-	    M = {Flatten Mrecu}
+      %Entree : une musique
+      %Sortie : un vecteur audio
+      %La musique en entree est decortiquee et chaque element est traite en fonction de sa nature (partition, wave, filtres, etc.)
+      fun {Final M}
 	    case M
 	    of nil then nil
 	    [] H|T then case H
 			of voix(Voix) then Voix|{Final T}
 			
-			[] partition(Partition) then {Browse 'casetoaudio'}
+			[] partition(Partition) then
 			   {ToAudio {Interprete Partition}}|{Final T}
 			
 			[] wave(Fichier) then
 			   {Projet.readFile CWD#Fichier}|{Final T}
 			
 			[] renverser(Musique) then
-			   {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
+			   {ToAudio {Renverser {Mix Interprete Musique}}}|{Final T}
 			
 			[] repetition(nombre:N Musique) then
 			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
@@ -149,17 +144,17 @@ local Mix Interprete Projet CWD in
 			[] merge(MusiquesAvecIntensites) then
 			   {Merge MusiquesAvecIntensites}|{Final T}
 			end
-	       [] K then case K
+	    [] K then case K
 			of voix(Voix) then Voix
 			
-			[] partition(Partition) then {Browse 'CASEpartition(Partition)'}
+			[] partition(Partition) then
 			   {ToAudio {Interprete Partition}}
 			
 			[] wave(Fichier) then
 			   {Projet.readFile CWD#Fichier}
 			
 			[] renverser(Musique) then
-			   {ToAudio {Renverser {Mix Interprete Musique} nil}}
+			   {ToAudio {Renverser {Mix Interprete Musique}}}
 			
 			[] repetition(nombre:N Musique) then
 			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}
@@ -191,14 +186,14 @@ local Mix Interprete Projet CWD in
 			[] merge(MusiquesAvecIntensites) then
 			   {Merge MusiquesAvecIntensites}
 			end
-	   	   % else {Mix Interprete M}
 	    end
 	 end
-      end
-      
-      fun {ToAudio ListeEchantillons1}
-	 {Browse 'ToAudio'}
-	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
+
+      %Entree : une liste d'echantillons
+      %Sortie : une liste de vecteurs audio
+      %les vecteurs audio sont calcules en fonction de la hauteur, donc de la frequence, des echantillons.
+      fun {ToAudio ListeEchantillons}
+	 local ToAudioAux NbAiS  NbAiTot in %ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
 	       if {IntToFloat I} == 0.0 then nil
 	       else
@@ -206,7 +201,6 @@ local Mix Interprete Projet CWD in
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
 		  [] H then local F Ai in
 			       F = {Number.pow 2.0 ({IntToFloat H}/12.0)} * 440.0
-			       %Ai = 0.5*{Sin ((2.0 * 3.14159265359 * F * ({IntToFloat N} - {IntToFloat I} + 1.0)) / 44100.0)}
 			       Ai = 0.5*{Sin (2.0*3.14159265359*F*({IntToFloat N}))/44100.0}
 			       Ai|{ToAudioAux H N+1 I-1}
 			    end
@@ -215,69 +209,78 @@ local Mix Interprete Projet CWD in
 	    end
 	    
 	    NbAiS = 44100.0
-	    ListeEchantillons = {Flatten ListeEchantillons1}
+	    
+	    %ListeEchantillons = {Flatten ListeEchantillons1}
+	    
 	    case ListeEchantillons
 	    of nil then nil
 	    [] H|T then case H
 			of silence(duree:S) then
 			   NbAiTot = {FloatToInt NbAiS*S}
-			   %{ToAudioAux 'silence' NbAiTot NbAiTot}|{ToAudio T}
 			   {ToAudioAux 'silence' 1 NbAiTot}|{ToAudio T}
 			[] echantillon(hauteur:H duree:S instrument:none) then
 			   NbAiTot = {FloatToInt NbAiS*S}
-			   %{ToAudioAux H NbAiTot NbAiTot}|{ToAudio T}
 			   {ToAudioAux H 1 NbAiTot}|{ToAudio T}
-	%		else {Mix Interprete ListeEchantillons}
 			else if H > ~1.0 then if H < 1.0 then H|{ToAudio T}
 					    end
 			   end
 			end
-	%    else {Mix Interprete ListeEchantillons}
 	    end
 	 end     
       end
-      
+
+      %Entree : L, une liste de musiques intensifiees
+      %Sortie : une liste de vecteurs audios traduisant les musiques jouees simultanement, chacune avec une intensite determinee (la somme des intensites ne depasse jamais 1)
       fun {Merge L}
 	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
-		     
+
+	    %Entree : L, une liste de musiques intensifiees
+	    %Sortie : la somme des intensites
 	    fun {IntensiteTotale L Acc}
 	       case L of nil then Acc
-	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisee qu'une seule fois : c'est normal :)
+	       [] H|T then case H of I#M then {IntensiteTotale T Acc+I} %Erreur : Variable M utilisee qu'une seule fois : c'est normal, on additionne les intensites
 			   end
 	       end
 	    end
 
+	    %Entree : I l'intensite a donner a la musique M
+	    %Sortie : un vecteur audio de la musique intensifiee
 	    fun {IntensifierMusic I M}
-	       local Maudio in
-		  Maudio = {ToAudio M}
+	       local Maudio Minter in
+		  Minter = {Mix Interprete M}
+		  Maudio = {ToAudio Minter}
 		  case Maudio of nil then nil
 		  [] H|T then (I*H)|{IntensifierMusic I T}
 		  end
 	       end
 	    end
 
+	    %Entree : L, une liste de musique à intensifier
+	    %Sortie : une liste de musiques intensifiees
 	    fun {IntensifierList L}
 	       case L of nil then nil
 	       [] H|T then case H of I#M then {IntensifierMusic (I/Itot) M}|{IntensifierList T}
 			   end
 	       end
 	    end
-		     
+
+	    %Entree : L1, L2 deux listes a additionner element par element
+	    %Sortie : une liste contenant l'addition des elements un a un des deux listes d'entree
 	    fun {AdditionList L1 L2}
 	       case L1
 	       of nil then case L2
 			   of nil then nil
 			   else L2
-                                    %[] H2|T2 then H2|{AdditionList L1 T2}
 			   end
 	       [] H1|T1 then case L2
 			     of nil then L1
-				      %of nil then H1|{AdditionList T1 L2}
 			     [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
 			     end
 	       end
 	    end
-		  
+
+	    %Entree : L, une liste de listes dont on veut la somme
+	    %Sortie : une liste dont toutes les listes ete additionnees suivant AdditionList
 	    fun {Somme L}
 	       case L of H|nil then H|nil
 	       [] H1|H2|T then {Somme ({AdditionList H1 H2}|T)}
@@ -289,15 +292,18 @@ local Mix Interprete Projet CWD in
 		  
 	 end
       end
-	    
+
+      %Entree : L, la liste à inverser, Acc un accumulateur qui vaut nil au départ
+      %Sortie : la liste L inversée
       fun {Renverser L Acc}
-%L est la liste à inverser, Acc un accumulateur qui vaut nil au départ (du au case dans lequel on fait appel à cette fonction)
 	 case L
 	 of nil then Acc
 	 [] H|T then {Renverser T H|Acc}
-	 end  
+	 end
       end
 
+      %Entree : NbRep, le nombre de fois qu'on veut repeter la musique M
+      %Sortie : la musique repetee le nombre de fois voulu
       fun {RepetitionN NbRep M}
 	 if NbRep==0 then M
 	 else if M==nil then {RepetitionN NbRep-1 M}
@@ -306,19 +312,28 @@ local Mix Interprete Projet CWD in
 	 end	    
       end
 
+      %Entree : Duree, le temps (en secondes) durant lequel on veut repeter la musique M
+      %Sortie : la musique repetee durant Duree
       fun {RepetitionD Duree M}
 	 local NbRep M1 M2 in
-	    NbRep = {TempsTotal M 0} div Duree
+	    NbRep = {FloatToInt {TempsTotal M 0.0}/ Duree}
 	    M1 = {RepetitionN NbRep M}
-	    fun {M2 Duree M Acc}
-	       if Acc+M.1.duree > Duree then nil
-	       else M.1|{M2 Duree M.2 Acc+M.1.duree}
+	    M2 = {Coupe 0.0 {FloatToInt {TempsTotal M 0.0}}mod{FloatToInt Duree} M}
+	    /*fun {M2 Duree M Acc}
+	       case M of nil then nil
+	       [] H|T then case H of echantillon(hauteur:H duree:D instrument:T) then if Acc+D > Duree then nil
+										      else H|{M2 Duree T Acc+D}
+										      end
+			   end
+		  
 	       end
-	    end
-	    M1 + {M2 Duree M 0.0}
+	    end*/
+	    M1 + M2
 	 end
       end
 
+      %Entree : un vecteur audio dont on veut faire l'echo apres un certain delai, un certain nombre de fois (Repetition) selon une certaine decadence
+      %Sortie : le vecteur audio voulu
       fun {Echo Delai Decadence Repetition Audio}
 	 local EquIntensite I EchoAux in
 	    fun {EquIntensite Dec Rep}
@@ -339,7 +354,9 @@ local Mix Interprete Projet CWD in
 
 	 end
       end
-	       
+
+      %Entree : un vecteur audio qu'on veut plafonner selon bas et haut
+      %Sortie : le vecteur audio plafonne
       fun {Clip Bas Haut Audio}
 	 case Audio
 	 of nil then nil
@@ -347,9 +364,16 @@ local Mix Interprete Projet CWD in
 		     elseif H > Haut then Haut|{Clip Bas Haut T}
 		     else H|{Clip Bas Haut T}
 		     end
+	 [] H then if H < Bas then Bas|nil
+		   elseif H > Haut then Haut|nil
+		   else H|nil
+		   end
 	 end	    
       end
-      
+
+      %Entree : un vecteur audio, la duree de l'ouverture et de la fermeture
+      %Sortie : le vecteur audio fondu
+      %l'intensite du vecteur audio va augmenter lineairement pendant l'ouverture et diminuer lineairement durant la fermeture
       fun {Fondu Ouverture Fermeture Audio}
 	 local FonduAux in
 
@@ -361,7 +385,7 @@ local Mix Interprete Projet CWD in
 	    end
 
 	    if Ouverture > 0.0 then if Fermeture > 0.0 then
-				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100 1.0} nil} Fermeture*44100 1.0} nil}
+				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100 1.0}} Fermeture*44100 1.0}}
 				    end
 	    
 	    elseif Ouverture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Ouverture) then
@@ -369,24 +393,30 @@ local Mix Interprete Projet CWD in
 					end
 	    
 	    elseif Fermeture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Fermeture) then
-					   {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
+					   {Renverser {FonduAux {Renverser Audio} Fermeture*Duree 1.0}}
 					end
 	    end
 	 end
       end
 
+      %Entree : deux fichiers audio qu'on enchaine avec un fondu
+      %Sortie : le vecteur audio transforme
       fun {FonduEnchaine Duree Audio1 Audio2}
 	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
-      
+
+      %Entree : une liste et un accumulateur a zero
+      %Sortie : la longueur de la liste
       fun {Longueur List Acc}
 	 case List of nil then Acc
 	 else {Longueur List.2 Acc+1}
 	 end
       end
-	    
+
+      %Entree : un fichier audio qu'on veut couper entre debut et fin
+      %Sortie : le fichier coupé
       fun {Coupe Debut Fin Audio}
-	 local Inter Silence CoupeAux in
+	 local Inter CoupeAux in
 	    fun {CoupeAux D F Audio}
 	       if F == 0.0 then nil
 	       elseif D == 0.0 then Audio.1|{Coupe 0.0 F-1 Audio.2}
@@ -397,38 +427,42 @@ local Mix Interprete Projet CWD in
 	    Inter = Fin - Debut
 	    if Inter < 0.0 then {Coupe Fin Debut Audio}
 	       
-	    elseif Debut < 0.0 then if Fin < 0.0 then {ToAudio {Etirer Inter {ToNote Silence}}} end
+	    elseif Debut < 0.0 then if Fin < 0.0 then {ToAudio {Etirer Inter {ToNote 'silence'}}} end
 	       
-	    elseif Debut < 0.0 then if Fin > 0.0 then {ToAudio {Etirer ~Debut {ToNote Silence}}}|{CoupeAux 0.0 Fin*44100.0 Audio} end
+	    elseif Debut < 0.0 then if Fin > 0.0 then {ToAudio {Etirer ~Debut {ToNote 'silence'}}}|{CoupeAux 0.0 Fin*44100.0 Audio} end
 	       
 	    else {CoupeAux Debut*44100.0 Fin*44100.0 Audio}
 	    end
 	 end
       end   
 
+      %Entree : une partition et un nombre de demitons
+      %Sortie : la partition transposee du nombre de demitons
       fun {Transpose NbreDemiTons Partition}
-{Browse 'Transpose'}
 	 case Partition
 	 of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
 	 end
       end
 
+      %Entree : une partition et une note
+      %Sortie : une partition dont toutes les notes ont ete remplacees par la note d'entree
       fun {Bourdon Note Partition}
-	 {Browse 'Bourdon'}
 	 if Partition == nil then nil
 	 else
 	    ({ToNote Note})|{Bourdon Note Partition.2}
 	 end
       end
 
+      %Entree : une partition
+      %Sortie : une partition dont toutes les notes ont ete remplacees par un silence
       fun {Muet Partition}
 	 {Bourdon 'silence' Partition}
       end
-	    
-      fun {Lire Partition1}
-	 local Partition in
-	    Partition = {Flatten Partition1}
+
+      %Entree : une partition
+      %Sortie : une liste d'echantillons
+      fun {Lire Partition}
 	    case Partition
 	    of nil then nil
 	    [] H|T then case H
@@ -460,8 +494,9 @@ local Mix Interprete Projet CWD in
 		      end
 	    end
 	 end
-      end
-      
+
+      %Entree : une partition
+      %Sortie : une liste d'echantillons
       fun {Interprete Partition}
 	 local P in
 	    P = {Flatten Partition}
@@ -469,6 +504,8 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
+      %Entree : une musique et une fonction interprete
+      %Sortie : une liste de vecteurs audio
       fun {Mix Interprete Music}
 	 local M in
 	    M = {Flatten Music}
@@ -478,14 +515,8 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'Lettre-A-Elise.oz'}
+      Music = {Projet.load CWD#'joie.dj.oz'}
    in
-      % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
-      % vous devez mixer une musique qui demontre les fonctionalites de votre
-      % programme.
-      %
-      % Si votre code devait ne pas passer nos tests, cet exemple serait le
-      % seul qui ateste de la validite de votre implementation.
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
 end
