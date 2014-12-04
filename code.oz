@@ -386,8 +386,8 @@ local Mix Interprete Projet CWD in
 		     else H|{Clip Bas Haut T}
 		     end
 
-	  [] K then if K < Bas then Bas|{Clip Bas Haut T}
-		     elseif K > Haut then Haut|{Clip Bas Haut T}
+	  [] K then if K < Bas then Bas
+		     elseif K > Haut then Haut
 		     else K
 		     end
 	end	    
@@ -440,14 +440,14 @@ local Mix Interprete Projet CWD in
 
       %Entree : un fichier audio qu'on veut couper entre debut et fin
       %Sortie : le fichier coupé
-% ?
+% CoupeAux OK
       fun {Coupe Debut Fin Audio}
 	 local Inter CoupeAux in
 
 	    fun {CoupeAux D F Audio}
 	       if F == 0.0 then nil
-	       elseif D == 0.0 then {Browse Audio.1} Audio.1|{Coupe 0.0 F-1.0 Audio.2}
-	       else {Coupe D-1.0 F-1.0 Audio.2}   
+	       elseif D == 0.0 then {Browse Audio.1} Audio.1|{CoupeAux 0.0 F-1.0 Audio.2}
+	       else {CoupeAux D-1.0 F-1.0 Audio.2}   
 	       end
 	    end
 		     
@@ -461,7 +461,7 @@ local Mix Interprete Projet CWD in
 	    else {CoupeAux Debut*44100.0 Fin*44100.0 Audio}
 	    end
 	 end
-      end   
+	 end
 
       %Entree : une partition et un nombre de demitons
       %Sortie : la partition transposee du nombre de demitons
