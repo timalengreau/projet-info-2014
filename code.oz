@@ -4,8 +4,8 @@
 
 local Mix Interprete Projet CWD in
 
-   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
@@ -304,7 +304,6 @@ local Mix Interprete Projet CWD in
 	    end
 	    
 	    Itot = {IntensiteTotale L 0.0}
-	    {Browse {Flatten {Somme {IntensifierList L}}}}
 	    {Flatten {Somme {IntensifierList L}}}
 	    
 	 end
@@ -395,27 +394,25 @@ local Mix Interprete Projet CWD in
       fun {Fondu Ouverture Fermeture Audio}
 	 local FonduAux LAudio in
 	    LAudio = {IntToFloat {Longueur Audio 0}}
-	    
 	    fun {FonduAux Audio Duree Acc}
 	       if Acc > Duree then nil
 	       else case Audio
 		    of nil then nil
-		    [] H|T then {Append ((H*Acc)/Duree)|{FonduAux T Duree Acc+1.0} {Coupe Ouverture LAudio/44100.0 Audio}}
-		    [] H then {Append (H*Acc)/Duree {Coupe Ouverture LAudio/44100.0 Audio}}
+		    [] H|T then ((H*Acc)/Duree)|{FonduAux T Duree Acc+1.0}
+		    [] H then (H*Acc)/Duree
 		    end
 	       end
 	    end
-	    
 	    if Ouverture > 0.0 then if Fermeture > 0.0 then
-				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100.0 1.0}} Fermeture*44100.0 1.0}}
+				       {Renverser {Append {FonduAux {Renverser Audio} Fermeture*44100.0 1.0} {Coupe Fermeture LAudio {Renverser {Append {FonduAux Audio Ouverture*44100.0 1.0} {Coupe Ouverture LAudio/44100.0 Audio}}}}}}
 				    end
 	       
 	    elseif Ouverture > 0.0 then if LAudio > (44100.0*Ouverture) then
-					   {FonduAux Audio Ouverture*44100.0 1.0}
+					   {Append {FonduAux Audio Ouverture*44100.0 1.0} {Coupe Ouverture LAudio/44100.0 Audio}}
 					end
 	       
 	    elseif Fermeture > 0.0 then if LAudio > (44100.0*Fermeture) then
-					   {Renverser {FonduAux {Renverser Audio} Fermeture*44100.0 1.0}}
+					   {Renverser {Append {FonduAux {Renverser Audio} Fermeture*44100.0 1.0} {Coupe Fermeture LAudio {Renverser Audio}}}}
 					end
 	    end
 	 end
@@ -423,7 +420,7 @@ local Mix Interprete Projet CWD in
 
       %Entree : deux fichiers audio qu'on enchaine avec un fondu
       %Sortie : le vecteur audio transforme
-% ? 
+
       fun {FonduEnchaine Duree Audio1 Audio2}
 	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
@@ -440,9 +437,9 @@ local Mix Interprete Projet CWD in
       %Sortie : le fichier coupé
       fun {Coupe Debut Fin Audio}
 	 local Inter CoupeAux in
-
 	    fun {CoupeAux D F Audio}
-	       if F == 0.0 then nil
+	       if Audio == nil then nil
+	       elseif F == 0.0 then nil
 	       elseif D == 0.0 then Audio.1|{CoupeAux 0.0 F-1.0 Audio.2}
 	       else {CoupeAux D-1.0 F-1.0 Audio.2}   
 	       end
