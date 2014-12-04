@@ -251,9 +251,7 @@ local Mix Interprete Projet CWD in
 
       %Entree : L, une liste de musiques intensifiees
       %Sortie : une liste de vecteurs audios traduisant les musiques jouees simultanement, chacune avec une intensite determinee (la somme des intensites ne depasse jamais 1)
-% ?
       fun {Merge L}
-	 {Browse 'Merge'}
 	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
 
 	    %Entree : L, une liste de musiques intensifiees
@@ -356,8 +354,8 @@ local Mix Interprete Projet CWD in
       fun {Echo Delai Decadence Repetition Audio}
 	 local EquIntensite I EchoAux in
 	    fun {EquIntensite Dec Rep}
-	       if Rep == 0.0 then 1.0
-	       else Dec^Rep+{EquIntensite Dec Rep-1.0}
+	       if Rep == 0 then 1.0
+	       else {Pow Dec {IntToFloat Rep}}+{EquIntensite Dec Rep-1}
 	       end
 	    end
 
@@ -365,11 +363,11 @@ local Mix Interprete Projet CWD in
 
 	    fun {EchoAux Del Dec Rep M Acc} 
 	       if Acc==Rep then nil
-	       else I^(Acc+1)#[voix[silence(duree:Del*Acc)] M]|{EchoAux Del Dec Rep M Acc+1.0}
+	       else {Pow I {IntToFloat (Acc+1)}}#[partition(silence(duree:Del*{IntToFloat Acc})) M]|{EchoAux Del Dec Rep M Acc+1}
 	       end
 	    end
 
-	    {EchoAux Delai Decadence Repetition Audio 0.0}
+	    {EchoAux Delai Decadence Repetition Audio 0}
 
 	 end
       end

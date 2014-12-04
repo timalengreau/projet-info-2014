@@ -5,6 +5,6 @@ local
     
 in
 
-   [merge([0.5#partition(A) 0.3#partition(B) 0.2#partition(C)])]
+   [echo(delai:2.0 decadence:0.5 repetition:3 partition(A))]
 
 end
