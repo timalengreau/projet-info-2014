@@ -1,4 +1,5 @@
 %The ice dance
+%Partition retranscrite de The Ice Dance du film Edward aux Mains d'Argent. Notre programme n'est malheureusement pas capable de la transformer en fichier wav car l'emulateur arrive a cours de memoire
 local
    MA = [etirer(facteur:4.0 b4) etirer(facteur:2.0 [b4 d5]) etirer(facteur:4.0 d5) etirer(facteur:2.0 [f#5 a5])]
    MAa = [etirer(facteur:4.0 [b4 b4 d5]) etirer(facteur:2.0 [f#5 a5])]
@@ -21,8 +22,10 @@ local
    
    Acc1 = [AccA AccA AccB AccC AccB AccC1 AccB AccC2 AccB AccC3 AccB AccC AccB AccC1]
    Acc2 = [AccA AccA AccBb AccC AccBb AccC1 AccBc AccC2 AccBc AccC3c AccBb AccC AccBb AccC1]
+
 in
    
    [merge([0.3#partition(M1) 0.3#partition(M2) 0.2#partition(Acc1) 0.2#partition(Acc2)])]
    
 end
+
