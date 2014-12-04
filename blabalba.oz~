@@ -1,47 +1,10 @@
 local
-   A = [1 1 1 1 1]
-   B = [0 1 2 3 4]
-  C = [0 0 0] 
-   fun {RepetitionN NbRep M}
-      if NbRep==1 then M
-      else {Append M {RepetitionN NbRep-1  M}}
-      end	    
-   end
-	    %Entree : L1, L2 deux listes a additionner element par element
-	    %Sortie : une liste contenant l'addition des elements un a un des deux listes d'entree
-   fun {AdditionList L1 L2}
-      case L1
-      of nil then case L2
-		  of nil then nil
-		  else L2
-		  end
-      [] H1|T1 then case L2
-		    of nil then L1
-		    [] H2|T2 then (H1+H2)|{AdditionList T1 T2}
-		       [] H2 then (H1+H2)|{AdditionList T1 L2}
-		    end
-      [] H1 then case L2
-		    of nil then L1
-		 [] H2|T2 then (H1+H2)|{AdditionList L1 T2}
-		       [] H2 then (H1+H2)|{AdditionList L1 L2}
-		    end
-      
-      end
-   end
-	    
-	    %Entree : L, une liste de listes dont on veut la somme
-	    %Sortie : une liste dont toutes les listes ete additionnees suivant AdditionList
-   fun {Somme L}
-      case L of H|nil then H|nil
-      [] H1|H2|T then {Somme {Append {AdditionList H1 H2} T}}
-      end 
-   end
-
-   Bla
+   A = [c4 d4 e4]
+   B = [e4 f4 g4]
+   C = [etirer(facteur:3.0 c4)]
+    
 in
-   
-   Bla = [couper(debut:1.0 fin:5.0 partition(A))]
 
-   {Browse {Somme [A B C]}}
+   [echo(delai:2.0 decadence:0.5 repetition:3 partition(A)]
 
 end
