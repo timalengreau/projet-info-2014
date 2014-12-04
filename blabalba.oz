@@ -5,6 +5,6 @@ local
     
 in
 
-   [echo(delai:2.0 decadence:0.5 repetition:3 partition(A))]
+   [echo(delai:2.0 decadence:0.5 repetition:3 partition(A)]
 
 end

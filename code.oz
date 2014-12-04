@@ -104,7 +104,7 @@ local Mix Interprete Projet CWD in
 	 case M
 	 of nil then nil
 	 [] H|T then case H
-		     of voix(Voix) then Voix|{Final T}
+		     of voix(Voix) then {ToAudio Voix}|{Final T}
 			
 		     [] partition(Partition) then
 			{ToAudio {Interprete Partition}}|{Final T}
@@ -144,12 +144,12 @@ local Mix Interprete Projet CWD in
 			
 		     [] merge(MusiquesAvecIntensites) then
 			{Merge MusiquesAvecIntensites}|{Final T}
-		     [] H then if H < ~1.0 then if H > 1.0 then H|{Final T}
+		     [] H then if H > ~1.0 then if H < 1.0 then H|{Final T}
 						end
 			       end
 		     end
 	 [] K then case K
-		   of voix(Voix) then Voix
+		   of voix(Voix) then {ToAudio Voix}
 
 		   [] partition(Partition) then
 		      {ToAudio {Interprete Partition}}
@@ -190,7 +190,7 @@ local Mix Interprete Projet CWD in
 		   [] merge(MusiquesAvecIntensites) then
 		      {Merge MusiquesAvecIntensites}
 		      
-		   [] K then if K < ~1.0 then if K > 1.0 then K
+		   [] K then if K > ~1.0 then if K < 1.0 then K
 						end
 			     end
 		   end
@@ -203,7 +203,7 @@ local Mix Interprete Projet CWD in
       fun {ToAudio ListeEchantillons}
 	 local ToAudioAux NbAiS  NbAiTot in %ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
-	       if {IntToFloat I} == 0.0 then nil
+	       if I == 0 then nil
 	       else
 		  case Hauteur
 		  of 'silence' then 0.0|{ToAudioAux 'silence' N I-1}
@@ -350,7 +350,6 @@ local Mix Interprete Projet CWD in
 
       %Entree : un vecteur audio dont on veut faire l'echo apres un certain delai, un certain nombre de fois (Repetition) selon une certaine decadence
       %Sortie : le vecteur audio voulu
-% ?
       fun {Echo Delai Decadence Repetition Audio}
 	 local EquIntensite I EchoAux in
 	    fun {EquIntensite Dec Rep}
@@ -360,14 +359,16 @@ local Mix Interprete Projet CWD in
 	    end
 
 	    I = 1.0/{EquIntensite Decadence Repetition}
-
+	    {Browse I}
+	   
 	    fun {EchoAux Del Dec Rep M Acc} 
 	       if Acc==Rep then nil
-	       else {Pow I {IntToFloat (Acc+1)}}#[partition(silence(duree:Del*{IntToFloat Acc})) M]|{EchoAux Del Dec Rep M Acc+1}
+	       else {Browse {IntToFloat Acc}}
+		  {Pow I {IntToFloat (Acc+1)}}#[voix([silence(duree:Del*{IntToFloat Acc})]) M]|{EchoAux Del Dec Rep M Acc+1}
 	       end
 	    end
 
-	    {EchoAux Delai Decadence Repetition Audio 0}
+	    {Merge {EchoAux Delai Decadence Repetition Audio 0}}
 
 	 end
       end
