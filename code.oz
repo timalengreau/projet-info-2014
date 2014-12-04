@@ -119,7 +119,7 @@ local Mix Interprete Projet CWD in
 			   {Projet.readFile CWD#Fichier}|{Final T}
 			
 			[] renverser(Musique) then
-			   {ToAudio {Renverser {Mix Interprete Musique} nil}}|{Final T}
+			   {ToAudio {Renverser {Mix Interprete Musique}}}|{Final T}
 			
 			[] repetition(nombre:N Musique) then
 			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}|{Final T}
@@ -160,7 +160,7 @@ local Mix Interprete Projet CWD in
 			   {Projet.readFile CWD#Fichier}
 			
 			[] renverser(Musique) then
-			   {ToAudio {Renverser {Mix Interprete Musique} nil}}
+			   {ToAudio {Renverser {Mix Interprete Musique}}}
 			
 			[] repetition(nombre:N Musique) then
 			   {ToAudio {RepetitionN N {Mix Interprete Musique}}}
@@ -201,7 +201,7 @@ local Mix Interprete Projet CWD in
 %OK
       fun {ToAudio ListeEchantillons}
 	 {Browse 'ToAudio'}
-	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
+	 local ToAudioAux NbAiS  NbAiTot /*ListeEchantillons*/ in
 	    fun {ToAudioAux Hauteur N I}
 	       if {IntToFloat I} == 0.0 then nil
 	       else
@@ -231,6 +231,18 @@ local Mix Interprete Projet CWD in
 					    end
 			   end
 			end
+	    [] K then case K
+			of silence(duree:S) then
+			   NbAiTot = {FloatToInt NbAiS*S}
+			   {ToAudioAux 'silence' 1 NbAiTot}
+			[] echantillon(hauteur:H duree:S instrument:none) then
+			   NbAiTot = {FloatToInt NbAiS*S}
+			   {ToAudioAux H 1 NbAiTot}
+			else if K > ~1.0 then if K < 1.0 then K
+					    end
+			   end
+			end
+	    
 	    end
 	 end     
       end
@@ -253,9 +265,9 @@ local Mix Interprete Projet CWD in
 	    %Entree : I l'intensite a donner a la musique M
 	    %Sortie : un vecteur audio de la musique intensifiee
 	    fun {IntensifierMusic I M}
-	       local Maudio Minter in
-		  Minter = {Mix Interprete M}
-		  Maudio = {ToAudio Minter}
+	       local Maudio /*Minter*/ in
+		  Maudio = {Mix Interprete M}
+		  %Maudio = {ToAudio Minter}
 		  case Maudio of nil then nil
 		  [] H|T then (I*H)|{IntensifierMusic I T}
 		  end
@@ -321,15 +333,13 @@ local Mix Interprete Projet CWD in
 
       %Entree : NbRep, le nombre de fois qu'on veut repeter la musique M
       %Sortie : la musique repetee le nombre de fois voulu
-% ?
+% Ok
       fun {RepetitionN NbRep M}
 	 if NbRep==0 then M
-	 else if M==nil then {RepetitionN NbRep-1 M}
-	      else M.1|{RepetitionN NbRep M.2}
-	      end
+	 else {Append M {RepetitionN NbRep-1  M}}
 	 end	    
       end
-
+      
       %Entree : Duree, le temps (en secondes) durant lequel on veut repeter la musique M
       %Sortie : la musique repetee durant Duree
 % ?
@@ -408,7 +418,7 @@ local Mix Interprete Projet CWD in
 	    end
 
 	    if Ouverture > 0.0 then if Fermeture > 0.0 then
-				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100 1.0} nil} Fermeture*44100 1.0} nil}
+				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100 1.0}} Fermeture*44100 1.0}}
 				    end
 	    
 	    elseif Ouverture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Ouverture) then
@@ -416,7 +426,7 @@ local Mix Interprete Projet CWD in
 					end
 	    
 	    elseif Fermeture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Fermeture) then
-					   {Renverser {FonduAux {Renverser Audio nil} Fermeture*Duree 1.0} nil}
+					   {Renverser {FonduAux {Renverser Audio} Fermeture*Duree 1.0}}
 					end
 	    end
 	 end
