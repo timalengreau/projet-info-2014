@@ -1,9 +1,10 @@
+%Exemple
 local
    A = [etirer(facteur:0.5 [c d e f g])]
    B = [etirer(facteur:0.4 [a b c5 transpose(demitons:12 d)])]
    Partition = [etirer(facteur:0.3 [A B])]
 
-   Musique = [merge([0.6#partition(A) 0.4#partition(B)]) repetition(nombre:2 [echo(delai:1.0 decadence:0.5 partition(Partition)) partition(A)]) couper(debut:0.0 fin:1.5 partition(A)) clip(bas:0.15 haut:0.95 partition([a b c])) renverser(partition(A))]
+   Musique = [merge([0.6#partition(A) 0.4#partition(B)]) repetition(nombre:2 [echo(delai:1.0 decadence:0.5 partition(Partition) partition(A)])) couper(debut:0.0 fin:1.5 partition(A)) clip(bas:0.15 haut:0.95 partition([a b c])) fondu(ouverture:1.0 fermeture:3.0 renverser(partition(A)))]
 
 in
    Musique

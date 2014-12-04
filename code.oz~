@@ -4,8 +4,8 @@
 
 local Mix Interprete Projet CWD in
 
-   CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
-   %CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
 
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
@@ -419,10 +419,6 @@ local Mix Interprete Projet CWD in
 
       %Entree : deux fichiers audio qu'on enchaine avec un fondu
       %Sortie : le vecteur audio transforme
-<<<<<<< HEAD
-=======
-
->>>>>>> 444f121c152aad74ccfb250239ed1944d2db2764
       fun {FonduEnchaine Duree Audio1 Audio2}
 	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
       end
