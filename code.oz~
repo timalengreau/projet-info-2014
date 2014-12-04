@@ -62,12 +62,20 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et le facteur avec lequel nous voulons étirer cette partition
       %Sortie : une partition dont la duree a ete multipliee par le facteur d'entree
       fun {Etirer Facteur Partition}
+	 /*case Partition of nil then nil
+	   [] H|T then case H of echantillon(hauteur:Hauteur duree:Duree instrument:Instrument) then  {Browse H} echantillon(hauteur:Hauteur duree:Duree*Facteur instrument:Instrument)|{Etirer Facteur T}
+		       [] silence(duree:Duree) then  {Browse H} silence(duree:Duree*Facteur)|{Etirer T}
+		       end
+	   [] H then  case H of echantillon(hauteur:Hauteur duree:Duree instrument:Instrument) then {Browse H} echantillon(hauteur:Hauteur duree:Duree*Facteur instrument:Instrument)
+		      [] silence(duree:Duree) then  {Browse H} silence(duree:Duree*Facteur)
+		      end
+	   end
+	 */
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
 	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)%|nil
 	 end
       end
-
       %Entree : une partition
       %Sortie : une liste d'echantillons
       fun {ToNote Partition}
@@ -190,7 +198,7 @@ local Mix Interprete Projet CWD in
 		      {Merge MusiquesAvecIntensites}
 		      
 		   [] K then if K > ~1.0 then if K < 1.0 then K
-						end
+					      end
 			     end
 		   end
 	 end
@@ -266,8 +274,8 @@ local Mix Interprete Projet CWD in
 	    %Sortie : un vecteur audio de la musique intensifiee
 	    fun {IntensifierMusic I M}
 	       case M of nil then nil
-		  [] H|T then (I*H)|{IntensifierMusic I T}
-		  end
+	       [] H|T then (I*H)|{IntensifierMusic I T}
+	       end
 	    end
 
 	    %Entree : L, une liste de musique à intensifier
@@ -537,7 +545,7 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'the-ice-dance.dj.oz'}
+      Music = {Projet.load CWD#'exemple.dj.oz'}
    in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end

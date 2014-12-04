@@ -428,9 +428,14 @@ local Mix Interprete Projet CWD in
       %Entree : deux fichiers audio qu'on enchaine avec un fondu
       %Sortie : le vecteur audio transforme
       fun {FonduEnchaine Duree Audio1 Audio2}
-	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
+	 local D L1  L2 in
+	    D = Duree * 44100.0
+	    L1 = {IntToFloat {Longueur Audio1 0}}
+	    L2 = {IntToFloat {Longueur Audio2 0}}
+	    {Merge ([0.5#[{Fondu 0.0 D Audio1} silence(duree:(L2-D)/44100.0)] 0.5#[silence(duree:(L1-Duree)/44100.0) {Fondu Duree 0.0 Audio2}]])}
+	 end
       end
-
+      
       %Entree : une liste et un accumulateur a zero
       %Sortie : la longueur de la liste
       fun {Longueur List Acc}
