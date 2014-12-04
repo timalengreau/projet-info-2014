@@ -29,9 +29,9 @@ local Mix Interprete Projet CWD in
       %la durée étant en secondes et la hauteur étant la différence de demitons entre la note en entrée et a4, le la de référence d'une fréquence de 440Hz.
       fun {ToEchantillon Note}
 	 local Nom C Hauteur H1 H2 in
-	    Nom = Note.nom
 	    if Note == 'silence' then silence(duree:1.0)
 	    else
+	       Nom = Note.nom
 	       if Nom == 'a' then H1 = 0
 	       elseif Nom == 'b' then H1 = 2
 	       elseif Nom == 'c' then H1 = ~9
@@ -71,28 +71,28 @@ local Mix Interprete Projet CWD in
       %Entree : une partition
       %Sortie : une liste d'echantillons
       fun {ToNote Partition}
-	 local M in
-	    case Partition
-	    of nil then nil
-	    [] H|T then case H
-			of Nom#Octave then M={ToEchantillon note(nom:Nom octave:Octave alteration:'#')}  M|{ToNote T}
-			[] Atom then
-			   case {AtomToString Atom}
-			   of [N] then M={ToEchantillon note(nom:Atom octave:4 alteration:none)} M|{ToNote T}
-			   [] [N O] then M={ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)} M|{ToNote T}
-			   end
-			else  H|{ToNote T}
+	 case Partition
+	 of nil then nil
+	 [] H|T then case H
+		     of 'silence' then {ToEchantillon 'silence'}|{ToNote T}
+		     [] Nom#Octave then {ToEchantillon note(nom:Nom octave:Octave alteration:'#')}|{ToNote T}
+		     [] Atom then
+			case {AtomToString Atom}
+			of [N] then {ToEchantillon note(nom:Atom octave:4 alteration:none)}|{ToNote T}
+			[] [N O] then {ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)}|{ToNote T}
 			end
-	    [] H
-	    then case H
-		 of Nom#Octave then {ToEchantillon note(nom:Nom octave:Octave alteration:'#')}
-		 [] Atom then
-		    case {AtomToString Atom}
-		    of [N] then {ToEchantillon note(nom:Atom octave:4 alteration:none)}
-		    [] [N O] then {ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)}
-		    end
+		     else  H|{ToNote T}
+		     end
+	 [] H
+	 then case H
+	      of 'silence' then {ToEchantillon 'silence'}
+	      [] Nom#Octave then {ToEchantillon note(nom:Nom octave:Octave alteration:'#')}
+	      [] Atom then
+		 case {AtomToString Atom}
+		 of [N] then {ToEchantillon note(nom:Atom octave:4 alteration:none)}
+		 [] [N O] then {ToEchantillon note(nom:{StringToAtom[N]} octave:{StringToInt[O]} alteration:none)}
 		 end
-	    end
+	      end
 	 end
       end
 
@@ -125,7 +125,7 @@ local Mix Interprete Projet CWD in
 			{Clip Bas Haut {Mix Interprete Musique}}|{Final T}
 			
 		     [] echo(delai:S Musique) then
-			{Echo S 1.0 1.0 {ToAudio {Mix Interprete Musique}}}|{Final T}
+			{Echo S 1.0 1.0 {Mix Interprete Musique}}|{Final T}
 			
 		     [] echo(delai:S decadence:D Musique) then
 			{Echo S D 1 {Mix Interprete Musique}}|{Final T}
@@ -183,7 +183,7 @@ local Mix Interprete Projet CWD in
 			
 		   [] fondu_enchaine(duree:S Musique1 Musique2) then
 		      {FonduEnchaine S {Mix Interprete Musique1} {Mix Interprete Musique2}}
-			
+
 		   [] couper(debut:Debut fin:Fin Musique) then
 		      {Coupe Debut Fin {Mix Interprete Musique}}
 			
@@ -234,16 +234,16 @@ local Mix Interprete Projet CWD in
 			     end
 			end
 	    [] K then case K
-			of silence(duree:S) then
-			   NbAiTot = {FloatToInt NbAiS*S}
-			   {ToAudioAux 'silence' 1 NbAiTot}
-			[] echantillon(hauteur:H duree:S instrument:none) then
-			   NbAiTot = {FloatToInt NbAiS*S}
-			   {ToAudioAux H 1 NbAiTot}
-			else if K > ~1.0 then if K < 1.0 then K
+		      of silence(duree:S) then
+			 NbAiTot = {FloatToInt NbAiS*S}
+			 {ToAudioAux 'silence' 1 NbAiTot}
+		      [] echantillon(hauteur:H duree:S instrument:none) then
+			 NbAiTot = {FloatToInt NbAiS*S}
+			 {ToAudioAux H 1 NbAiTot}
+		      else if K > ~1.0 then if K < 1.0 then K
 					    end
 			   end
-			end
+		      end
 	    
 	    end
 	 end     
@@ -340,10 +340,11 @@ local Mix Interprete Projet CWD in
       %Sortie : la musique repetee durant Duree
       fun {RepetitionD Duree M}
 	 local NbRep M1 M2 Ttot in
-	    Ttot = {TempsTotal M 0.0}
+	    Ttot = {IntToFloat {Longueur M 0}}
 	    NbRep = {FloatToInt Duree*44100.0/Ttot}
 	    M1 = {RepetitionN NbRep-1 M}
 	    M2 = {Coupe 0.0 Duree-(Ttot*{IntToFloat NbRep}/44100.0) M}
+	    
 	    {Append M1 M2}
 	 end
       end
@@ -382,36 +383,40 @@ local Mix Interprete Projet CWD in
 		     elseif H > Haut then Haut|{Clip Bas Haut T}
 		     else H|{Clip Bas Haut T}
 		     end
-	  [] K then if K < Bas then Bas
-		     elseif K > Haut then Haut
-		     else K
-		     end
-	end	    
+	 [] K then if K < Bas then Bas
+		   elseif K > Haut then Haut
+		   else K
+		   end
+	 end	    
       end
 
       %Entree : un vecteur audio, la duree de l'ouverture et de la fermeture
       %Sortie : le vecteur audio fondu
       %l'intensite du vecteur audio va augmenter lineairement pendant l'ouverture et diminuer lineairement durant la fermeture
       fun {Fondu Ouverture Fermeture Audio}
-	 local FonduAux in
-
+	 local FonduAux LAudio in
+	    LAudio = {IntToFloat {Longueur Audio 0}}
+	    
 	    fun {FonduAux Audio Duree Acc}
-	       if Acc == Duree then nil
-	       else
-		  ((Audio.1*Acc)/Duree)|{FonduAux Audio.2 Duree Acc+1.0}
+	       if Acc > Duree then nil
+	       else case Audio
+		    of nil then nil
+		    [] H|T then {Append ((H*Acc)/Duree)|{FonduAux T Duree Acc+1.0} {Coupe Ouverture LAudio/44100.0 Audio}}
+		    [] H then {Append (H*Acc)/Duree {Coupe Ouverture LAudio/44100.0 Audio}}
+		    end
 	       end
 	    end
-
-	    if Ouverture > 0.0 then if Fermeture > 0.0 then
-				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100 1.0}} Fermeture*44100 1.0}}
-				    end
 	    
-	    elseif Ouverture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Ouverture) then
+	    if Ouverture > 0.0 then if Fermeture > 0.0 then
+				       {Renverser {FonduAux {Renverser {FonduAux Audio Ouverture*44100.0 1.0}} Fermeture*44100.0 1.0}}
+				    end
+	       
+	    elseif Ouverture > 0.0 then if LAudio > (44100.0*Ouverture) then
 					   {FonduAux Audio Ouverture*44100.0 1.0}
 					end
-	    
-	    elseif Fermeture > 0.0 then if {IntToFloat {Longueur Audio 0}} > (44100.0*Fermeture) then
-					   {Renverser {FonduAux {Renverser Audio} Fermeture*Duree 1.0}}
+	       
+	    elseif Fermeture > 0.0 then if LAudio > (44100.0*Fermeture) then
+					   {Renverser {FonduAux {Renverser Audio} Fermeture*44100.0 1.0}}
 					end
 	    end
 	 end
@@ -439,22 +444,24 @@ local Mix Interprete Projet CWD in
 
 	    fun {CoupeAux D F Audio}
 	       if F == 0.0 then nil
-	       elseif D == 0.0 then {Browse Audio.1} Audio.1|{CoupeAux 0.0 F-1.0 Audio.2}
+	       elseif D == 0.0 then Audio.1|{CoupeAux 0.0 F-1.0 Audio.2}
 	       else {CoupeAux D-1.0 F-1.0 Audio.2}   
 	       end
 	    end
-		     
+	    
 	    Inter = Fin - Debut
 	    if Inter < 0.0 then {Coupe Fin Debut Audio}
 	       
-	    elseif Debut < 0.0 then if Fin < 0.0 then {ToAudio {Etirer Inter {ToNote 'silence'}}} end
+	    elseif Debut < 0.0 then if Fin < 0.0
+				    then {ToAudio {Etirer Inter {ToNote 'silence'}}} end
 	       
-	    elseif Debut < 0.0 then if Fin > 0.0 then {ToAudio {Etirer ~Debut {ToNote 'silence'}}}|{CoupeAux 0.0 Fin*44100.0 Audio} end
+	    elseif Debut < 0.0 then if Fin > 0.0
+				    then {ToAudio {Etirer ~Debut {ToNote 'silence'}}}|{CoupeAux 0.0 Fin*44100.0 Audio} end
 	       
 	    else {CoupeAux Debut*44100.0 Fin*44100.0 Audio}
 	    end
 	 end
-	 end
+      end
 
       %Entree : une partition et un nombre de demitons
       %Sortie : la partition transposee du nombre de demitons
@@ -527,7 +534,6 @@ local Mix Interprete Projet CWD in
       %Entree : une musique et une fonction interprete
       %Sortie : une liste de vecteurs audio
       fun {Mix Interprete Music}
-	 {Browse 'Mix'}
 	 local M in
 	    M = {Flatten Music}
 	    {Flatten {Final M}}	    
