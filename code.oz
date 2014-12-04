@@ -101,6 +101,7 @@ local Mix Interprete Projet CWD in
       %La musique en entree est decortiquee et chaque element est traite en fonction de sa nature (partition, wave, filtres, etc.)
 % A PRIORI QUOIQUE      
       fun {Final M}
+	 {Browse 'final'}
 	 case M
 	 of nil then nil
 	 [] H|T then case H
@@ -137,6 +138,7 @@ local Mix Interprete Projet CWD in
 			{Fondu Ouv Ferm {Mix Interprete Musique}}|{Final T}
 			
 		     [] fondu_enchaine(duree:S Musique1 Musique2) then
+			{Browse 'fonduenchaine final'}
 			{FonduEnchaine S {Mix Interprete Musique1} {Mix Interprete Musique2}}|{Final T}
 			
 		     [] couper(debut:Debut fin:Fin Musique) then
@@ -182,6 +184,7 @@ local Mix Interprete Projet CWD in
 		      {Fondu Ouv Ferm {Mix Interprete Musique}}
 			
 		   [] fondu_enchaine(duree:S Musique1 Musique2) then
+		      {Browse 'fonduenchaine final'}
 		      {FonduEnchaine S {Mix Interprete Musique1} {Mix Interprete Musique2}}
 
 		   [] couper(debut:Debut fin:Fin Musique) then
@@ -407,13 +410,13 @@ local Mix Interprete Projet CWD in
 				       {Renverser {Append {FonduAux {Renverser Audio} Fermeture*44100.0 1.0} {Coupe Fermeture LAudio {Renverser {Append {FonduAux Audio Ouverture*44100.0 1.0} {Coupe Ouverture LAudio/44100.0 Audio}}}}}}
 				    end
 	       
-	    elseif Ouverture > 0.0 then if LAudio > (44100.0*Ouverture) then
+	    elseif Ouverture > 0.0 then %if LAudio > (44100.0*Ouverture) then
 					   {Append {FonduAux Audio Ouverture*44100.0 1.0} {Coupe Ouverture LAudio/44100.0 Audio}}
-					end
+				%	end
 	       
-	    elseif Fermeture > 0.0 then if LAudio > (44100.0*Fermeture) then
+	    elseif Fermeture > 0.0 then %if LAudio > (44100.0*Fermeture) then
 					   {Renverser {Append {FonduAux {Renverser Audio} Fermeture*44100.0 1.0} {Coupe Fermeture LAudio {Renverser Audio}}}}
-					end
+				%	end
 	    end
 	 end
       end
@@ -422,7 +425,9 @@ local Mix Interprete Projet CWD in
       %Sortie : le vecteur audio transforme
 
       fun {FonduEnchaine Duree Audio1 Audio2}
-	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree [voix([silence(({Longueur Audio1 0}/44100.0)-Duree)]) Audio2]}])}
+	 {Browse 'FonduEnchaine'}
+	 {Browse Duree}
+	 {Merge ([0.5#{Fondu Duree 0.0 Audio1} 0.5#{Fondu 0.0 Duree {Append {ToAudio [silence(duree:({Longueur Audio1 0}/44100.0)-Duree)]} Audio2}}])}
       end
 
       %Entree : une liste et un accumulateur a zero
@@ -539,7 +544,7 @@ local Mix Interprete Projet CWD in
    end
    
    local 
-      Music = {Projet.load CWD#'Lettre-A-Elise.dj.oz'}
+      Music = {Projet.load CWD#'blabalba.oz'}
    in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
