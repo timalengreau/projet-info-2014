@@ -52,7 +52,8 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et la durée voulue pour cette partition
       %Sortie : une partition qui dure la duree totale voulue d'entrée
       fun {Duree DureeTotaleVoulue Partition}
-	 local DureeActuelle in
+	 {Browse 'Duree'}
+	 local DureeActuelle K in
 	    DureeActuelle = {TempsTotal Partition 0.0}
 	    {Etirer DureeTotaleVoulue/DureeActuelle Partition}
 	 end
@@ -61,9 +62,10 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et le facteur avec lequel nous voulons étirer cette partition
       %Sortie : une partition dont la duree a ete multipliee par le facteur d'entree
       fun {Etirer Facteur Partition}
+	 {Browse 'Etirer'}
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
-	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)%|nil
+	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|nil
 	 end
       end
 
@@ -104,7 +106,7 @@ local Mix Interprete Projet CWD in
 	    [] H|T then case H
 			of voix(Voix) then Voix|{Final T}
 			
-			[] partition(Partition) then
+			[] partition(Partition) then {Browse 'casetoaudio'}
 			   {ToAudio {Interprete Partition}}|{Final T}
 			
 			[] wave(Fichier) then
@@ -145,11 +147,10 @@ local Mix Interprete Projet CWD in
 			end
 	    [] K then case K
 			of voix(Voix) then Voix
-			
-			[] partition(Partition) then
-			   {ToAudio {Interprete Partition}}
-			
-			[] wave(Fichier) then
+
+		      [] partition(Partition) then {ToAudio {Interprete Partition}}
+			 
+		      [] wave(Fichier) then
 			   {Projet.readFile CWD#Fichier}
 			
 			[] renverser(Musique) then
@@ -192,6 +193,7 @@ local Mix Interprete Projet CWD in
       %Sortie : une liste de vecteurs audio
       %les vecteurs audio sont calcules en fonction de la hauteur, donc de la frequence, des echantillons.
       fun {ToAudio ListeEchantillons1}
+	 {Browse 'ToAudio'}
 	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
 	       if {IntToFloat I} == 0.0 then nil
@@ -434,6 +436,7 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et un nombre de demitons
       %Sortie : la partition transposee du nombre de demitons
       fun {Transpose NbreDemiTons Partition}
+{Browse 'Transpose'}
 	 case Partition
 	 of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
@@ -443,6 +446,7 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et une note
       %Sortie : une partition dont toutes les notes ont ete remplacees par la note d'entree
       fun {Bourdon Note Partition}
+	 {Browse 'Bourdon'}
 	 if Partition == nil then nil
 	 else
 	    ({ToNote Note})|{Bourdon Note Partition.2}

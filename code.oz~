@@ -1,6 +1,16 @@
+<<<<<<< HEAD
 %code mixe une musique et renvoit un fichier wave
 %Auteurs : Timothee Malengreau NOMA : 6618-13-00
 %          Charlotte Poncette NOMA : 9458-12-00
+=======
+local Mix Interprete Projet CWD in
+   % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
+   % modifiez sa valeur pour correspondre Ã  votre systeme.
+
+
+   %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Charlotte\\Documents\\UCL\\Q3\\Informatique\\projet-info-2014\\'}
+>>>>>>> origin/master
 
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' '/home/tim/projet-info-2014/'}
@@ -9,6 +19,7 @@ local Mix Interprete Projet CWD in
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    local Lire Final  ToAudio Merge Renverser RepetitionN RepetitionD Clip Echo Fondu FonduEnchaine Longueur Coupe Transpose Bourdon Muet ToEchantillon TempsTotal ToNote Duree Etirer in
+<<<<<<< HEAD
 
       %Entrée : une partition (Partition) et un accumulateur (TempsTot) qu'on doit initialiser à 0.0
       %Sortie : la durée totale de la partition en secondes.
@@ -17,6 +28,15 @@ local Mix Interprete Projet CWD in
 	 of nil then TempsTot 
 	 [] H|T then case H
 		     of  echantillon(hauteur:H duree:D instrument:none)
+=======
+      
+      fun {TempsTotal Partition TempsTot}
+	 {Browse 'TempsTotal'}
+	 case Partition
+	 of nil then TempsTot 
+	 [] H|T then case H
+		     of  note(hauteur:H duree:D instrument:none)
+>>>>>>> origin/master
 		     then {TempsTotal T TempsTot+D}
 		     else {TempsTotal T TempsTot}
 		     end
@@ -52,18 +72,28 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et la durée voulue pour cette partition
       %Sortie : une partition qui dure la duree totale voulue d'entrée
       fun {Duree DureeTotaleVoulue Partition}
-	 local DureeActuelle in
+	 {Browse 'Duree'}
+	 local DureeActuelle K in
 	    DureeActuelle = {TempsTotal Partition 0.0}
 	    {Etirer DureeTotaleVoulue/DureeActuelle Partition}
+<<<<<<< HEAD
+=======
+	    
+>>>>>>> origin/master
 	 end
       end
 
       %Entree : une partition et le facteur avec lequel nous voulons étirer cette partition
       %Sortie : une partition dont la duree a ete multipliee par le facteur d'entree
       fun {Etirer Facteur Partition}
+	 {Browse 'Etirer'}
 	 case Partition of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|{Etirer Facteur T}
+<<<<<<< HEAD
 	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)%|nil
+=======
+	 [] H then echantillon(hauteur:H.hauteur duree:H.duree*Facteur instrument:H.instrument)|nil
+>>>>>>> origin/master
 	 end
       end
 
@@ -104,7 +134,7 @@ local Mix Interprete Projet CWD in
 	    [] H|T then case H
 			of voix(Voix) then Voix|{Final T}
 			
-			[] partition(Partition) then
+			[] partition(Partition) then {Browse 'casetoaudio'}
 			   {ToAudio {Interprete Partition}}|{Final T}
 			
 			[] wave(Fichier) then
@@ -143,10 +173,17 @@ local Mix Interprete Projet CWD in
 			[] merge(MusiquesAvecIntensites) then
 			   {Merge MusiquesAvecIntensites}|{Final T}
 			end
+<<<<<<< HEAD
 	    [] K then case K
 			of voix(Voix) then Voix
 			
 			[] partition(Partition) then
+=======
+	       [] K then case K
+			of voix(Voix) then Voix
+			
+			[] partition(Partition) then {Browse 'CASEpartition(Partition)'}
+>>>>>>> origin/master
 			   {ToAudio {Interprete Partition}}
 			
 			[] wave(Fichier) then
@@ -185,6 +222,10 @@ local Mix Interprete Projet CWD in
 			[] merge(MusiquesAvecIntensites) then
 			   {Merge MusiquesAvecIntensites}
 			end
+<<<<<<< HEAD
+=======
+	   	   % else {Mix Interprete M}
+>>>>>>> origin/master
 	    end
 	 end
 
@@ -192,6 +233,7 @@ local Mix Interprete Projet CWD in
       %Sortie : une liste de vecteurs audio
       %les vecteurs audio sont calcules en fonction de la hauteur, donc de la frequence, des echantillons.
       fun {ToAudio ListeEchantillons1}
+	 {Browse 'ToAudio'}
 	 local ToAudioAux NbAiS  NbAiTot ListeEchantillons in
 	    fun {ToAudioAux Hauteur N I}
 	       if {IntToFloat I} == 0.0 then nil
@@ -218,16 +260,25 @@ local Mix Interprete Projet CWD in
 			[] echantillon(hauteur:H duree:S instrument:none) then
 			   NbAiTot = {FloatToInt NbAiS*S}
 			   {ToAudioAux H 1 NbAiTot}|{ToAudio T}
+<<<<<<< HEAD
+=======
+	%		else {Mix Interprete ListeEchantillons}
+>>>>>>> origin/master
 			else if H > ~1.0 then if H < 1.0 then H|{ToAudio T}
 					    end
 			   end
 			end
+	%    else {Mix Interprete ListeEchantillons}
 	    end
 	 end     
       end
+<<<<<<< HEAD
 
       %Entree : L, une liste de musiques intensifiees
       %Sortie : une liste de vecteurs audios traduisant les musiques jouees simultanement, chacune avec une intensite determinee (la somme des intensites ne depasse jamais 1)
+=======
+      
+>>>>>>> origin/master
       fun {Merge L}
 	 local Itot IntensiteTotale IntensifierMusic IntensifierList AdditionList Somme in
 
@@ -293,6 +344,7 @@ local Mix Interprete Projet CWD in
       %Entree : L, la liste à inverser, Acc un accumulateur qui vaut nil au départ
       %Sortie : la liste L inversée
       fun {Renverser L Acc}
+	 {Browse 'REnverser'}
 	 case L
 	 of nil then Acc
 	 [] H|T then {Renverser T H|Acc}
@@ -433,6 +485,7 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et un nombre de demitons
       %Sortie : la partition transposee du nombre de demitons
       fun {Transpose NbreDemiTons Partition}
+{Browse 'Transpose'}
 	 case Partition
 	 of nil then nil
 	 [] H|T then echantillon(hauteur:H.hauteur+NbreDemiTons duree:H.duree instrument:H.instrument)|{Transpose NbreDemiTons T}
@@ -442,6 +495,7 @@ local Mix Interprete Projet CWD in
       %Entree : une partition et une note
       %Sortie : une partition dont toutes les notes ont ete remplacees par la note d'entree
       fun {Bourdon Note Partition}
+	 {Browse 'Bourdon'}
 	 if Partition == nil then nil
 	 else
 	    ({ToNote Note})|{Bourdon Note Partition.2}
@@ -510,7 +564,11 @@ local Mix Interprete Projet CWD in
    end
    
    local 
+<<<<<<< HEAD
       Music = {Projet.load CWD#'blabalba.oz'}
+=======
+      Music = {Projet.load CWD#'Lettre-A-Elise.oz'}
+>>>>>>> origin/master
    in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end

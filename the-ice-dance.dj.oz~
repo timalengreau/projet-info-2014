@@ -1,26 +1,33 @@
 %The ice dance
 local
-   MA = [etirer(facteur:4.0 b) etirer(facteur:2.0 [b d]) etirer(facteur:4.0 d) etirer(facteur:2.0 [f#4 a5])]
-   MAa = [etirer(facteur:4.0 [b b d]) etirer(facteur:2.0 [f#4 a5])]
-   MAb = [etirer(facteur:2.0 [f#5 a6])]
-   MB = [etirer(facteur:4.0 [b3 g3 f#3 d3])]
-   MBb = [etirer(facteur:2.0 [b3 g3 b4 g3]) etirer(facteur:4.0 [f#3 d3])]
+   MA = [etirer(facteur:4.0 b4) etirer(facteur:2.0 [b4 d5]) etirer(facteur:4.0 d5) etirer(facteur:2.0 [f#5 a5])]
+   MAa = [etirer(facteur:4.0 [b4 b4 d5]) etirer(facteur:2.0 [f#5 a5])]
+   MAb = [etirer(facteur:2.0 [f#6 a6])]
+   MB = [etirer(facteur:4.0 [b4 g5 f#4 d5])]
+   MBb = [etirer(facteur:2.0 [b4 g5 b5 g5]) etirer(facteur:4.0 [f#5 d5])]
    
-   M1 = [MA MAa transpose(demitons:~12 MA) transpose(demitons:~12 MA) MB MBb transpose(demitons:~12 MA) transpose(demitons:~12 MA)]
-   M2 = [etirer(facteur:28.0 silence) MAb MA MA transpose(demitons:12 MB) transpose(demitons:12 MBb) MA MA]
+   M1 = [MA MAa transpose(demitons:~12 MA) transpose(demitons:~12 MA) transpose(demitons:~12 MB) transpose(demitons:~12 MBb) transpose(demitons:~12 MA) transpose(demitons:~12 MA)]
+   M2 = [etirer(facteur:28.0 silence) MAb MA MA MB MBb MA MA]
    
-   AccA = [etirer(facteur:4.0 [b3 g2 f#3 d3])]
-   AccB = [g1 d2 g2 d2 g2 d2 g2 d2]
-   AccBb = [g1 d2 g2 d2 g1 d2 g1 d2]
-   AccBc = [g1 d2 g2 d2 g1 d2 g2 d2]
-   AccC = [b2 f#2 b3 f#2 d2 a3 d3 a3]
-   AccC1 = [b2 f#2 b3 f#2 d2 a3 etirer(facteur:2.0 d3)]
-   AccC2 = [b2 f#2 b3 f#2 b2 f#2 b3 f#2]
-   AccC3 = [b2 f#2 b3 f#2 etirer(facteur:4.0 b3)]
-   AccC3c = [b2 f#2 b3 f#2 etirer(facteur:4.0 b2)]
+   AccA = [etirer(facteur:4.0 [b3 g3 f#4 d4])]
+   AccB = [g2 d3 g3 d3 g3 d3 g3 d3]
+   AccBb = [g2 d3 g3 d3 g2 d3 g2 d3]
+   AccBc = [g2 d3 g3 d3 g2 d3 g3 d3]
+   AccC = [b2 f#3 b3 f#3 d3 a3 d4 a3]
+   AccC1 = [b2 f#3 b3 f#3 d3 a3 etirer(facteur:2.0 d4)]
+   AccC2 = [b2 f#3 b3 f#3 b2 f#3 b3 f#3]
+   AccC3 = [b2 f#3 b3 f#3 etirer(facteur:4.0 b3)]
+   AccC3c = [b2 f#3 b3 f#3 etirer(facteur:4.0 b2)]
    
    Acc1 = [AccA AccA AccB AccC AccB AccC1 AccB AccC2 AccB AccC3 AccB AccC AccB AccC1]
    Acc2 = [AccA AccA AccBb AccC AccBb AccC1 AccBc AccC2 AccBc AccC3c AccBb AccC AccBb AccC1]
+<<<<<<< HEAD
+   
+in
+   
+   [merge([0.3#partition(M1) 0.3#partition(M2) 0.2#partition(Acc1) 0.2#partition(Acc2)])]
+   
+=======
    %Partition = [M1 M2 Acc1 Acc2]
    %Partition = merge[0.3#partition(M1) 0.3#partition(M2) 0.2#partition(Acc1) 0.2#partition(Acc2)]
 in
@@ -28,4 +35,5 @@ in
    [merge([0.3#partition(M1) 0.3#partition(M2) 0.2#partition(Acc1) 0.2#partition(Acc2)])]
    %[merge([0.5#partition(M1) 0.5#partition(M2)])]% 0.2#partition(Acc1) 0.2#partition(Acc2)])]
    %[partition(Partition)]
+>>>>>>> origin/master
 end
