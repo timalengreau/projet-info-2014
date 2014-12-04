@@ -22,9 +22,10 @@ local
    
    Acc1 = [AccA AccA AccB AccC AccB AccC1 AccB AccC2 AccB AccC3 AccB AccC AccB AccC1]
    Acc2 = [AccA AccA AccBb AccC AccBb AccC1 AccBc AccC2 AccBc AccC3c AccBb AccC AccBb AccC1]
-   
+
 in
    
    [merge([0.3#partition(M1) 0.3#partition(M2) 0.2#partition(Acc1) 0.2#partition(Acc2)])]
    
 end
+
